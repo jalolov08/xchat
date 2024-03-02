@@ -1,13 +1,25 @@
-import {View, Text, TouchableOpacity} from 'react-native';
+import {View, Text, TouchableOpacity, Alert} from 'react-native';
 import React, {useState} from 'react';
 import styles from './login.style';
 import PhoneInput from '../../components/PhoneInput/phoneInput.component';
 import CheckBox from 'react-native-check-box';
-import {lightColors} from '../../constants/lightColors.constant';
+import {darkColors} from '../../constants/darkColors.constant';
 import Icon, {Icons} from '../../ui/Icon/icon.ui';
+import {useAuth} from '../../contexts/AuthContext/auth.context';
+import {useNavigation} from '@react-navigation/native';
 export default function Login() {
   const [phone, setPhone] = useState('');
   const [isChecked, setIsChecked] = useState(false);
+  const {onLogin, authState} = useAuth();
+  const navigation = useNavigation();
+  const handleLogin = async () => {
+    const result = await onLogin(phone);
+    if (result.error) {
+      Alert.alert(result.msg);
+    } else {
+      navigation.navigate('Verify');
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.textCont}>
@@ -23,8 +35,8 @@ export default function Login() {
           style={{width: 18, height: 18}}
           onClick={() => setIsChecked(!isChecked)}
           isChecked={isChecked}
-          checkBoxColor={lightColors.text}
-          uncheckedCheckBoxColor={lightColors.placeHolder}
+          checkBoxColor={darkColors.text}
+          uncheckedCheckBoxColor={darkColors.placeHolder}
         />
         <Text style={styles.privacyText}>
           Пользовательское соглашение — договор между владельцем компьютерной
@@ -33,12 +45,13 @@ export default function Login() {
       </View>
       <TouchableOpacity
         style={[styles.nextBtn, (!phone || !isChecked) && {opacity: 0.5}]}
-        disabled={!phone || !isChecked}>
+        disabled={!phone || !isChecked}
+        onPress={handleLogin}>
         <Text style={styles.btnText}>Далее</Text>
         <Icon
           type={Icons.Ionicons}
           name="arrow-forward-outline"
-          color={lightColors.text}
+          color={darkColors.text}
         />
       </TouchableOpacity>
     </View>

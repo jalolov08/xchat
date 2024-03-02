@@ -21,17 +21,6 @@ export default StyleSheet.create({
   textCont: {
     marginTop: '48%',
   },
-  privacyCont: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  privacyText: {
-    color: darkColors.placeHolder,
-    fontWeight: '400',
-    fontSize: 15,
-    width: '90%',
-  },
   nextBtn: {
     borderWidth: 1,
     borderColor: darkColors.accent,
