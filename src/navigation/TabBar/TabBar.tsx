@@ -4,6 +4,7 @@ import Icon, {Icons} from '../../ui/Icon/icon.ui'; // Assuming Icon component im
 import ContactStack from '../ContactStack/contact.stack';
 import SettingsStack from '../SettingsStack/settings.stack';
 import {darkColors} from '../../constants/darkColors.constant';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
@@ -25,6 +26,23 @@ export default function TabNavigator() {
       icon: 'gear',
     },
   ];
+  const visibleRoutes = [
+    'AdDetails',
+    'Category',
+    'SelectBrand',
+    'SelectModel',
+    'SelectCity',
+  ];
+
+  const getTabBarVisibility = route => {
+    const routeName = getFocusedRouteNameFromRoute(route);
+
+    if (visibleRoutes.includes(routeName)) {
+      return 'none';
+    } else {
+      return 'flex';
+    }
+  };
 
   return (
     <Tab.Navigator

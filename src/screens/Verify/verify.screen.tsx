@@ -16,8 +16,7 @@ export default function Verify({navigation}) {
   const handleVerify = async () => {
     const result = await onVerify(code);
     if (result.data.token) {
-      console.log('Token is verified');
-      navigation.navigate('Chats');
+      navigation.navigate('ChangeProfile');
     } else {
       Alert.alert(result.data.error);
       setCode('');
