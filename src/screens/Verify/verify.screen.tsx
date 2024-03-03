@@ -9,14 +9,15 @@ import Icon, {Icons} from '../../ui/Icon/icon.ui';
 import {useAuth} from '../../contexts/AuthContext/auth.context';
 const CELL_COUNT = 6;
 
-export default function Verify() {
+export default function Verify({navigation}) {
   const [code, setCode] = useState('');
   const {onVerify, authState} = useAuth();
-
+  
   const handleVerify = async () => {
     const result = await onVerify(code);
     if (result.data.token) {
       console.log('Token is verified');
+      navigation.navigate('Chats');
     } else {
       Alert.alert(result.data.error);
       setCode('');

@@ -6,12 +6,10 @@ import CheckBox from 'react-native-check-box';
 import {darkColors} from '../../constants/darkColors.constant';
 import Icon, {Icons} from '../../ui/Icon/icon.ui';
 import {useAuth} from '../../contexts/AuthContext/auth.context';
-import {useNavigation} from '@react-navigation/native';
-export default function Login() {
+export default function Login({navigation}) {
   const [phone, setPhone] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const {onLogin, authState} = useAuth();
-  const navigation = useNavigation();
   const handleLogin = async () => {
     const result = await onLogin(phone);
     if (result.error) {

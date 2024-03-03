@@ -1,18 +1,16 @@
-import {View, StyleSheet} from 'react-native';
+import { StyleSheet} from 'react-native';
 import React from 'react';
-import Login from './src/screens/Login/login.screen';
-import Verify from './src/screens/Verify/verify.screen';
-import AuthStack from './src/navigation/AuthStack/auth.stack';
 import {NavigationContainer} from '@react-navigation/native';
 import {AuthProvider} from './src/contexts/AuthContext/auth.context';
-
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import MainStack from './src/navigation/index';
+const RootStack = createNativeStackNavigator();
 export default function App() {
+
   return (
     <AuthProvider>
       <NavigationContainer>
-        <View style={styles.container}>
-          <AuthStack />
-        </View>
+        <MainStack />
       </NavigationContainer>
     </AuthProvider>
   );
