@@ -11,17 +11,17 @@ const Tab = createBottomTabNavigator();
 export default function TabNavigator() {
   const tabConfigs = [
     {
-      name: 'Contacts',
+      name: 'ContactsStack',
       component: ContactStack,
       icon: 'address-book',
     },
     {
-      name: 'Chats',
+      name: 'ChatsStack',
       component: ChatStack,
       icon: 'comments',
     },
     {
-      name: 'Settings',
+      name: 'SettingsStack',
       component: SettingsStack,
       icon: 'gear',
     },

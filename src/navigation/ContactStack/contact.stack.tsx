@@ -1,7 +1,7 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import Chats from '../../screens/Chats/chat.screen';
+import Contacts from '../../screens/Contacts/contacts.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -11,7 +11,7 @@ export default function ContactStack() {
       screenOptions={{
         headerShown: false,
       }}>
-      <Stack.Screen name="Chats" component={Chats} />
+      <Stack.Screen name="Contacts" component={Contacts} />
     </Stack.Navigator>
   );
 }
