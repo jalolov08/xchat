@@ -84,14 +84,15 @@ export default function ChangeProfile({navigation}) {
       }
 
       const uploadedPhotoUri = await uploadAvatar();
-
+      console.log(name , surname , uploadedPhotoUri);
+      
       const res = await axios.post(`${API_BASE}/user/change`, {
         name,
         surname,
         photoUri: uploadedPhotoUri,
       });
 
-      navigation.navigate('Chats');
+      navigation.navigate('Home');
     } catch (error) {
       console.error(error.response.data);
     }

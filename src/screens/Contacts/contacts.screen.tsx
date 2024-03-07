@@ -11,7 +11,7 @@ import contact from '../../assets/animations/contact.json';
 import errorLoad from '../../assets/animations/error.json';
 import empty from '../../assets/animations/empty.json';
 
-export default function ContactsScreen() {
+export default function ContactsScreen({navigation}) {
   const [contactList, setContactList] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,9 +22,16 @@ export default function ContactsScreen() {
     const fetchContacts = async () => {
       try {
         setLoading(true);
-        const contacts: string[] = await getContacts();
+        const contacts = await getContacts();
+        console.log(contacts);
+        const allNumbers = contacts.reduce((numbers, contact) => {
+          const contactNumbers = contact.phoneNumbers.map(
+            phoneNumber => phoneNumber.number,
+          );
+          return [...numbers, ...contactNumbers];
+        }, []);
         setContactList(contacts);
-        await syncContacts(contacts);
+        await syncContacts(allNumbers);
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -105,11 +112,27 @@ export default function ContactsScreen() {
       <ScrollView>
         {sortedFilteredUsers.map(user => {
           const {name, surname, photoUri, phone, _id} = user;
-          const fullName = `${name} ${surname}`;
+          const contact = contactList.find(contact =>
+            contact.phoneNumbers.some(
+              phoneNumber => phoneNumber.number === phone,
+            ),
+          );
+
+          let contactName = name + ' ' + surname;
+
+          if (contact) {
+            contactName = contact.displayName;
+          }
+
           return (
-            <TouchableOpacity style={styles.contact} key={_id}>
+            <TouchableOpacity
+              style={styles.contact}
+              key={_id}
+              onPress={() =>
+                navigation.navigate('AboutContact', {user, contact})
+              }>
               <Image source={{uri: `${API}${photoUri}`}} style={styles.image} />
-              <Text style={styles.fullName}>{fullName}</Text>
+              <Text style={styles.fullName}>{contactName}</Text>
             </TouchableOpacity>
           );
         })}

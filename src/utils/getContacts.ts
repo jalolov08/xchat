@@ -14,14 +14,14 @@ export async function getContacts() {
 
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
       const contacts = await Contacts.getAll();
-      const allNumbers = contacts.reduce((numbers, contact) => {
-        const contactNumbers = contact.phoneNumbers.map(
-          phoneNumber => phoneNumber.number,
-        );
-        return [...numbers, ...contactNumbers];
-      }, []);
+      // const allNumbers = contacts.reduce((numbers, contact) => {
+      //   const contactNumbers = contact.phoneNumbers.map(
+      //     phoneNumber => phoneNumber.number,
+      //   );
+      //   return [...numbers, ...contactNumbers];
+      // }, []);
 
-      return allNumbers;
+      return contacts;
     } else {
       console.log('Contacts permission denied');
       return [];
