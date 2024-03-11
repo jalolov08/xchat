@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {View, Text, Image, ScrollView, TouchableOpacity} from 'react-native';
 import styles from './contacts.style';
 import Search from '../../ui/Search/search.ui';
@@ -10,10 +10,11 @@ import Lottie from '../../ui/Lottie/lottie.ui';
 import contact from '../../assets/animations/contact.json';
 import errorLoad from '../../assets/animations/error.json';
 import empty from '../../assets/animations/empty.json';
+import useContactStore from '../../zustand/useContacts';
 
 export default function ContactsScreen({navigation}) {
-  const [contactList, setContactList] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const {contactList, setContactList} = useContactStore();
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<TUser[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -21,9 +22,7 @@ export default function ContactsScreen({navigation}) {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        setLoading(true);
         const contacts = await getContacts();
-        console.log(contacts);
         const allNumbers = contacts.reduce((numbers, contact) => {
           const contactNumbers = contact.phoneNumbers.map(
             phoneNumber => phoneNumber.number,
@@ -40,39 +39,40 @@ export default function ContactsScreen({navigation}) {
     };
 
     fetchContacts();
-  }, []);
+  }, [contactList]);
 
   async function syncContacts(contacts: string[]) {
     try {
       const response = await axios.post<{users: TUser[]}>(
         `${API_BASE}/user/sync`,
-        {
-          phones: contacts,
-        },
+        {phones: contacts},
       );
       setUsers(response.data.users);
-      // console.log(response.data.users);
     } catch (error) {
       console.log(error.response.data);
       throw new Error(error.response.data.message);
     }
   }
 
-  const filteredUsers = users.filter(user => {
-    const fullName = `${user.name} ${user.surname}`;
-    return fullName.toLowerCase().includes(searchQuery.toLowerCase());
-  });
-  const sortedFilteredUsers = filteredUsers.sort((a, b) => {
-    const fullNameA = `${a.name} ${a.surname}`.toLowerCase();
-    const fullNameB = `${b.name} ${b.surname}`.toLowerCase();
-    if (fullNameA < fullNameB) {
-      return -1;
-    }
-    if (fullNameA > fullNameB) {
-      return 1;
-    }
-    return 0;
-  });
+  const sortedFilteredUsers = useMemo(() => {
+    return users
+      .filter(user => {
+        const fullName = `${user.name} ${user.surname}`;
+        return fullName.toLowerCase().includes(searchQuery.toLowerCase());
+      })
+      .sort((a, b) => {
+        const fullNameA = `${a.name} ${a.surname}`.toLowerCase();
+        const fullNameB = `${b.name} ${b.surname}`.toLowerCase();
+        if (fullNameA < fullNameB) {
+          return -1;
+        }
+        if (fullNameA > fullNameB) {
+          return 1;
+        }
+        return 0;
+      });
+  }, [users, searchQuery]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Контакты</Text>
@@ -98,7 +98,7 @@ export default function ContactsScreen({navigation}) {
           style={{alignSelf: 'center', marginTop: 100}}
         />
       )}
-      {filteredUsers.length === 0 &&
+      {sortedFilteredUsers.length === 0 &&
         !loading &&
         !error &&
         searchQuery.length > 0 && (

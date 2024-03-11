@@ -12,12 +12,13 @@ import HeaderBack from '../../ui/HeaderBack/headerBack.ui';
 import {API} from '../../../config';
 import {TextInput} from 'react-native-paper';
 import Contacts from 'react-native-contacts';
+import useContactStore from '../../zustand/useContacts';
 
 const EditContact = ({route, navigation}) => {
   const {user, contact} = route.params;
   const [firstName, setFirstName] = useState(contact.givenName);
   const [lastName, setLastName] = useState(contact.familyName);
-
+  const updateContact = useContactStore((state) => state.updateContact);
   useEffect(() => {
     requestWriteContactsPermission();
   }, []);
@@ -31,8 +32,8 @@ const EditContact = ({route, navigation}) => {
       };
 
       await Contacts.updateContact(updatedContact);
-
-      navigation.goBack();
+      updateContact(updatedContact);
+      navigation.navigate("Contacts");
     } catch (error) {
       console.error('Ошибка при сохранении контакта:', error);
     }
