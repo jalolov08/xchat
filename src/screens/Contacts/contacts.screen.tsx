@@ -109,7 +109,7 @@ export default function ContactsScreen({navigation}) {
             style={{alignSelf: 'center', marginTop: 100}}
           />
         )}
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {sortedFilteredUsers.map(user => {
           const {name, surname, photoUri, phone, _id} = user;
           const contact = contactList.find(contact =>

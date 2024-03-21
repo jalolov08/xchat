@@ -6,7 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 interface IAuthState {
   token: string | null;
   authenticated: boolean | null;
-  phone: string | null;
+  phone?: string | null;
+  _id?: string | null; 
 }
 
 interface IAuth {
@@ -26,6 +27,7 @@ export const AuthProvider = ({children}: any) => {
     token: null,
     authenticated: null,
     phone: null,
+    _id:null
   });
 
   useEffect(() => {
@@ -33,11 +35,26 @@ export const AuthProvider = ({children}: any) => {
       const token = await AsyncStorage.getItem('token');
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        setAuthState(prevState => ({
-          ...prevState,
-          token: token,
-          authenticated: true,
-        }));
+        try {
+          const response = await axios.get(`${API_BASE}/auth/me`);
+          const { _id, phone } = response.data.user; 
+          setAuthState(prevState => ({
+            ...prevState,
+            token: token,
+            authenticated: true,
+            phone: phone,
+            _id: _id, 
+          }));
+        } catch (error) {
+          console.error('Ошибка получения данных пользователя:', error);
+          setAuthState(prevState => ({
+            ...prevState,
+            token: null,
+            authenticated: false,
+            phone: null,
+            _id: null, 
+          }));
+        }
       }
     };
     loadToken();
