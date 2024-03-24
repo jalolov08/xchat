@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
-import {darkColors} from '../../constants/darkColors.constant';
 import {TextInputMask} from 'react-native-masked-text';
+import { useScheme } from '../../contexts/ThemeContext/theme.context';
 
 type TPhoneInput = {
   value: string;
@@ -9,11 +9,23 @@ type TPhoneInput = {
 };
 
 export default function PhoneInput({value, onChange}: TPhoneInput) {
+    const {colors} = useScheme()
+const styles = StyleSheet.create({
+  input: {
+    marginTop: 70,
+    width: '100%',
+    fontSize: 19,
+    color: colors.text,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+});
   return (
     <TextInputMask
       style={styles.input}
       placeholder="Телефон"
-      placeholderTextColor={darkColors.placeHolder}
+      placeholderTextColor={colors.placeHolder}
       keyboardType="phone-pad"
       type={'custom'}
       options={{
@@ -26,14 +38,3 @@ export default function PhoneInput({value, onChange}: TPhoneInput) {
   );
 }
 
-const styles = StyleSheet.create({
-  input: {
-    marginTop: 70,
-    width: '100%',
-    fontSize: 19,
-    color: darkColors.text,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: darkColors.border,
-  },
-});

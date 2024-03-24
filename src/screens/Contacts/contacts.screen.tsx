@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useMemo} from 'react';
 import {View, Text, Image, ScrollView, TouchableOpacity} from 'react-native';
-import styles from './contacts.style';
+import {styles as contactsStyles} from './contacts.style';
 import Search from '../../ui/Search/search.ui';
 import {getContacts} from '../../utils/getContacts';
 import axios from 'axios';
@@ -11,6 +11,7 @@ import contact from '../../assets/animations/contact.json';
 import errorLoad from '../../assets/animations/error.json';
 import empty from '../../assets/animations/empty.json';
 import useContactStore from '../../zustand/useContacts';
+import { useScheme } from '../../contexts/ThemeContext/theme.context';
 
 export default function ContactsScreen({navigation}) {
   const {contactList, setContactList} = useContactStore();
@@ -18,7 +19,8 @@ export default function ContactsScreen({navigation}) {
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<TUser[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-
+  const styles = contactsStyles();
+  const {colors} = useScheme()
   useEffect(() => {
     const fetchContacts = async () => {
       try {

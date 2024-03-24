@@ -8,18 +8,20 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import styles from './changeProfile.style';
+import {styles as changeStyles} from './changeProfile.style';
 import HeaderBack from '../../ui/HeaderBack/headerBack.ui';
 import userDefault from '../../assets/user.png';
 import {launchImageLibrary} from 'react-native-image-picker';
 import axios from 'axios';
 import {API_BASE} from '../../../config';
+import { useScheme } from '../../contexts/ThemeContext/theme.context';
 
 export default function ChangeProfile({navigation}) {
   const [photoUri, setPhotoUri] = useState(null);
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
-
+  const styles = changeStyles()
+  const {colors} = useScheme()
   const [photo, setPhoto] = useState({
     uri: null,
     name: null,

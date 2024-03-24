@@ -4,6 +4,6 @@ export const darkColors = {
   primary: '#FFFFFF',
   accent: '#FFFFFF',
   placeHolder: 'hsla(0, 0%, 100%, 0.6)',
-  border:'hsla(0, 0%, 100%, 0.1)',
-  
+  border: 'hsla(0, 0%, 100%, 0.1)',
+  search: 'hsla(0, 0%, 100%, 0.1)',
 };

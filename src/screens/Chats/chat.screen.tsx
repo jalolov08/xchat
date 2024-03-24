@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext/auth.context';
 import useChats, { Chat } from '../../zustand/useChats';
 import Search from '../../ui/Search/search.ui';
-import styles from './chat.style';
+import { styles as chatStyles } from './chat.style'; // Переименовал styles в chatStyles
 import { API } from '../../../config';
 import errorLoad from '../../assets/animations/error.json';
 import empty from '../../assets/animations/empty.json';
 import Lottie from '../../ui/Lottie/lottie.ui';
+import { useScheme } from '../../contexts/ThemeContext/theme.context';
 
 interface OtherParticipant {
   user: string;
@@ -20,8 +21,14 @@ export default function Chats() {
   const navigation = useNavigation();
   const { chats } = useChats();
   const { authState } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { dark, setScheme, colors } = useScheme();
+  const styles = chatStyles(); // Вызываем функцию styles
+
+  const toggleTheme = () => {
+    setScheme(dark ? 'light' : 'dark');
+  };
+
   const sortChatsByDate = (chats: Chat[]) => {
     return chats.slice().sort((a, b) => {
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
@@ -59,10 +66,9 @@ export default function Chats() {
         value={searchQuery}
         onChange={setSearchQuery}
       />
-      {isLoading ? (
-        <Lottie source={errorLoad} />
-      ) : sortedChats.length === 0 ? (
-          <Lottie source={empty} />
+      <Switch value={dark} onValueChange={toggleTheme} />
+      {sortedChats.length === 0 ? (
+        <Lottie source={empty} />
       ) : (
         <FlatList
           data={sortedChats}

@@ -1,15 +1,17 @@
 import {View, Text, TouchableOpacity, Alert} from 'react-native';
 import React, {useState} from 'react';
-import styles from './login.style';
+import {styles as loginStyles} from './login.style';
 import PhoneInput from '../../components/PhoneInput/phoneInput.component';
 import CheckBox from 'react-native-check-box';
-import {darkColors} from '../../constants/darkColors.constant';
 import Icon, {Icons} from '../../ui/Icon/icon.ui';
 import {useAuth} from '../../contexts/AuthContext/auth.context';
+import {useScheme} from '../../contexts/ThemeContext/theme.context';
 export default function Login({navigation}) {
   const [phone, setPhone] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const {onLogin, authState} = useAuth();
+  const {colors} = useScheme();
+  const styles = loginStyles();
   const handleLogin = async () => {
     const result = await onLogin(phone);
     if (result.error) {
@@ -33,8 +35,8 @@ export default function Login({navigation}) {
           style={{width: 18, height: 18}}
           onClick={() => setIsChecked(!isChecked)}
           isChecked={isChecked}
-          checkBoxColor={darkColors.text}
-          uncheckedCheckBoxColor={darkColors.placeHolder}
+          checkBoxColor={colors.text}
+          uncheckedCheckBoxColor={colors.placeHolder}
         />
         <Text style={styles.privacyText}>
           Пользовательское соглашение — договор между владельцем компьютерной
@@ -49,7 +51,7 @@ export default function Login({navigation}) {
         <Icon
           type={Icons.Ionicons}
           name="arrow-forward-outline"
-          color={darkColors.text}
+          color={colors.text}
         />
       </TouchableOpacity>
     </View>

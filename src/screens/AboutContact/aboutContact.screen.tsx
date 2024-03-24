@@ -1,20 +1,23 @@
 import {View, Text, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
-import styles from './aboutContact.style';
+import {styles as aboutStyles} from './aboutContact.style';
 import HeaderBack from '../../ui/HeaderBack/headerBack.ui';
 import {API} from '../../../config';
 import Icon, {Icons} from '../../ui/Icon/icon.ui';
-import {darkColors} from '../../constants/darkColors.constant';
+import { useScheme } from '../../contexts/ThemeContext/theme.context';
 export default function AboutContact({route, navigation}) {
   const {user, contact} = route.params;
-
+  const styles = aboutStyles();
+  const {colors} = useScheme()
   return (
     <View style={styles.container}>
       <HeaderBack
         title="О контакте"
         backIcon={true}
         rightIconName="create-outline"
-        onRightIconClick={() => navigation.navigate('EditContact', {contact , user})}
+        onRightIconClick={() =>
+          navigation.navigate('EditContact', {contact, user})
+        }
       />
       <View style={styles.contactCont}>
         <Image
@@ -33,7 +36,7 @@ export default function AboutContact({route, navigation}) {
         <Icon
           type={Icons.Ionicons}
           name="chatbox-outline"
-          color={darkColors.accent}
+          color={colors.accent}
         />
       </TouchableOpacity>
       <TouchableOpacity style={styles.optionCont}>
@@ -41,7 +44,7 @@ export default function AboutContact({route, navigation}) {
         <Icon
           type={Icons.Ionicons}
           name="trash-outline"
-          color={darkColors.accent}
+          color={colors.accent}
         />
       </TouchableOpacity>
       <TouchableOpacity style={styles.optionCont}>
@@ -49,7 +52,7 @@ export default function AboutContact({route, navigation}) {
         <Icon
           type={Icons.Ionicons}
           name="hand-left-outline"
-          color={darkColors.accent}
+          color={colors.accent}
         />
       </TouchableOpacity>
     </View>

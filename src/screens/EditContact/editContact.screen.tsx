@@ -3,22 +3,23 @@ import {
   Image,
   PermissionsAndroid,
   Platform,
-  StyleSheet,
   Text,
   View,
 } from 'react-native';
-import {darkColors} from '../../constants/darkColors.constant';
 import HeaderBack from '../../ui/HeaderBack/headerBack.ui';
 import {API} from '../../../config';
 import {TextInput} from 'react-native-paper';
 import Contacts from 'react-native-contacts';
 import useContactStore from '../../zustand/useContacts';
-
+import {styles as editStyles} from './editContact.style';
+import { useScheme } from '../../contexts/ThemeContext/theme.context';
 const EditContact = ({route, navigation}) => {
   const {user, contact} = route.params;
   const [firstName, setFirstName] = useState(contact.givenName);
   const [lastName, setLastName] = useState(contact.familyName);
-  const updateContact = useContactStore((state) => state.updateContact);
+  const updateContact = useContactStore(state => state.updateContact);
+  const styles = editStyles();
+  const {colors} = useScheme()
   useEffect(() => {
     requestWriteContactsPermission();
   }, []);
@@ -33,7 +34,7 @@ const EditContact = ({route, navigation}) => {
 
       await Contacts.updateContact(updatedContact);
       updateContact(updatedContact);
-      navigation.navigate("Contacts");
+      navigation.navigate('Contacts');
     } catch (error) {
       console.error('Ошибка при сохранении контакта:', error);
     }
@@ -80,61 +81,26 @@ const EditContact = ({route, navigation}) => {
           label="Имя*"
           value={firstName}
           onChangeText={text => setFirstName(text)}
-          placeholderTextColor={darkColors.placeHolder}
+          placeholderTextColor={colors.placeHolder}
           mode="flat"
           style={styles.input}
-          textColor={darkColors.text}
-          underlineColor={darkColors.accent}
-          activeUnderlineColor={darkColors.placeHolder}
+          textColor={colors.text}
+          underlineColor={colors.accent}
+          activeUnderlineColor={colors.placeHolder}
         />
         <TextInput
           label="Фамилия"
           value={lastName}
           onChangeText={text => setLastName(text)}
-          placeholderTextColor={darkColors.placeHolder}
+          placeholderTextColor={colors.placeHolder}
           mode="flat"
           style={styles.input}
-          textColor={darkColors.text}
-          underlineColor={darkColors.accent}
-          activeUnderlineColor={darkColors.placeHolder}
+          textColor={colors.text}
+          underlineColor={colors.accent}
+          activeUnderlineColor={colors.placeHolder}
         />
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: darkColors.background,
-  },
-  contactCont: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomColor: darkColors.border,
-    borderBottomWidth: 1,
-  },
-  contactPhoto: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-  },
-  contactName: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: darkColors.text,
-  },
-  contactPhone: {
-    fontSize: 17,
-    color: darkColors.placeHolder,
-  },
-  input: {
-    fontSize: 18,
-    marginTop: 12,
-    backgroundColor: 'transparent',
-    borderColor: darkColors.border,
-  },
-});
-
 export default EditContact;

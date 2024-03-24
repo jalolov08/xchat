@@ -1,18 +1,18 @@
 import {View, Text, TouchableOpacity, Alert} from 'react-native';
 import React, {useState} from 'react';
-import styles from './verify.style';
+import {styles as verifyStyles} from './verify.style';
 import {CodeField, Cursor} from 'react-native-confirmation-code-field';
-import {darkColors} from '../../constants/darkColors.constant';
-import {lightColors} from '../../constants/lightColors.constant';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon, {Icons} from '../../ui/Icon/icon.ui';
 import {useAuth} from '../../contexts/AuthContext/auth.context';
+import {useScheme} from '../../contexts/ThemeContext/theme.context';
 const CELL_COUNT = 6;
 
 export default function Verify({navigation}) {
   const [code, setCode] = useState('');
   const {onVerify, authState} = useAuth();
-  
+  const styles = verifyStyles();
+  const {colors} = useScheme();
   const handleVerify = async () => {
     const result = await onVerify(code);
     if (result.data.token) {
@@ -48,15 +48,13 @@ export default function Verify({navigation}) {
               margin: 5,
               justifyContent: 'center',
               alignItems: 'center',
-              borderBottomColor: isFocused
-                ? darkColors.text
-                : darkColors.border,
+              borderBottomColor: isFocused ? colors.text : colors.border,
               borderBottomWidth: 2,
             }}>
             <Text
               style={{
                 fontSize: 24,
-                color: darkColors.text,
+                color: colors.text,
                 fontWeight: '600',
               }}>
               {symbol || (isFocused ? <Cursor /> : null)}

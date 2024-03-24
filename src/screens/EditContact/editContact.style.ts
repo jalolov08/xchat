@@ -1,6 +1,5 @@
 import {StyleSheet} from 'react-native';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
-
 export const styles = () => {
   const {colors} = useScheme();
   return StyleSheet.create({
@@ -29,19 +28,11 @@ export const styles = () => {
       fontSize: 17,
       color: colors.placeHolder,
     },
-    optionCont: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: 20,
-      paddingHorizontal: 16,
-      borderBottomColor: colors.border,
-      borderBottomWidth: 1,
-    },
-    optionText: {
-      fontSize: 17,
-      color: colors.text,
-      fontWeight: '400',
+    input: {
+      fontSize: 18,
+      marginTop: 12,
+      backgroundColor: 'transparent',
+      borderColor: colors.border,
     },
   });
 };

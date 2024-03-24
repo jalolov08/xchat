@@ -3,12 +3,13 @@ import ChatStack from '../ChatStack/chat.stack';
 import Icon, {Icons} from '../../ui/Icon/icon.ui'; // Assuming Icon component imports icons
 import ContactStack from '../ContactStack/contact.stack';
 import SettingsStack from '../SettingsStack/settings.stack';
-import {darkColors} from '../../constants/darkColors.constant';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { useScheme } from '../../contexts/ThemeContext/theme.context';
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
+  const {colors} = useScheme()
   const tabConfigs = [
     {
       name: 'ContactsStack',
@@ -61,13 +62,13 @@ export default function TabNavigator() {
               <Icon
                 type={Icons.FontAwesome}
                 name={tabConfig.icon}
-                color={focused ? darkColors.accent : darkColors.placeHolder}
+                color={focused ? colors.accent : colors.placeHolder}
               />
             ),
             tabBarStyle: {
               height: 70,
-              backgroundColor: darkColors.background,
-              borderTopColor: darkColors.border,
+              backgroundColor: colors.background,
+              borderTopColor: colors.border,
               borderTopWidth: 1,
               paddingHorizontal: 70,
             },

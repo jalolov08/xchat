@@ -1,38 +1,44 @@
-import {View, TextInput, StyleSheet, StyleProp, ViewStyle} from 'react-native';
 import React from 'react';
-import Icon, {Icons} from '../Icon/icon.ui';
-import {darkColors} from '../../constants/darkColors.constant';
+import { View, TextInput, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import Icon, { Icons } from '../Icon/icon.ui';
+import { useScheme } from '../../contexts/ThemeContext/theme.context';
+
 type TSearch = {
   containerStyle?: StyleProp<ViewStyle>;
   value?: string;
-  onChange?: () => void;
+  onChange?: (text: string) => void; 
 };
-export default function Search({containerStyle, value, onChange}: TSearch) {
+
+export default function Search({ containerStyle, value, onChange }: TSearch) {
+  const { colors } = useScheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      height: 40,
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      backgroundColor: colors.search,
+      borderRadius: 12,
+    },
+  });
+
   return (
     <View style={[styles.container, containerStyle]}>
       <Icon
         type={Icons.Ionicons}
         name="search"
-        style={{margin: 10}}
-        color={darkColors.placeHolder}
+        size={20}
+        style={{ margin: 10 }}
+        color={colors.placeHolder}
       />
       <TextInput
         placeholder="Поиск"
-        placeholderTextColor={darkColors.placeHolder}
+        placeholderTextColor={colors.placeHolder}
         keyboardType="default"
         value={value}
-        onChangeText={onChange}
+        onChangeText={onChange} 
       />
     </View>
   );
 }
-const styles = StyleSheet.create({
-  container: {
-    height: 40,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    backgroundColor: darkColors.border,
-    borderRadius: 12,
-  },
-});

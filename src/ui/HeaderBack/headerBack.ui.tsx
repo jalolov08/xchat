@@ -1,8 +1,8 @@
 import {View, Text, StyleSheet, Pressable} from 'react-native';
 import React from 'react';
-import {darkColors} from '../../constants/darkColors.constant';
 import Icon, {Icons} from '../Icon/icon.ui';
 import {useNavigation} from '@react-navigation/native';
+import { useScheme } from '../../contexts/ThemeContext/theme.context';
 type THeader = {
   backIcon?: boolean;
   title?: string;
@@ -16,6 +16,25 @@ export default function HeaderBack({
   onRightIconClick,
 }: THeader) {
   const navigation = useNavigation();
+  const {colors} = useScheme()
+  const styles = StyleSheet.create({
+    container: {
+      height: 60,
+      backgroundColor: colors.background,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent:'center',
+      borderBottomColor: colors.border,
+      borderBottomWidth: 1,
+      padding: 16,
+    },
+    title: {
+      fontSize: 22,
+      color: colors.primary,
+      marginLeft: 10,
+      fontWeight:'600'
+    },
+  });
   return (
     <View style={styles.container}>
       {backIcon && (
@@ -23,7 +42,7 @@ export default function HeaderBack({
           <Icon
             type={Icons.Ionicons}
             name="arrow-back-outline"
-            color={darkColors.primary}
+            color={colors.primary}
             size={28}
           />
         </Pressable>
@@ -34,7 +53,7 @@ export default function HeaderBack({
           <Icon
             type={Icons.Ionicons}
             name={rightIconName}
-            color={darkColors.primary}
+            color={colors.primary}
             size={28}
           />
         </Pressable>
@@ -43,19 +62,4 @@ export default function HeaderBack({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    height: 60,
-    backgroundColor: darkColors.background,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomColor: darkColors.border,
-    borderBottomWidth: 1,
-    padding:16
-  },
-  title: {
-    fontSize: 22,
-    color: darkColors.primary,
-    marginLeft: 10,
-  },
-});
+

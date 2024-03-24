@@ -5,5 +5,5 @@ export const lightColors = {
   accent: '#005C60',
   placeHolder: 'hsla(0, 0%, 6%, 0.6)',
   border: 'hsla(0, 0%, 6%, 0.1)',
-
+  search: 'hsla(182, 100%, 19%, 0.1)',
 };
