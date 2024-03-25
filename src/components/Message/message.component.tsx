@@ -49,7 +49,8 @@ export default function Message({
   return (
     <View style={styles.container}>
       <Text style={styles.message}>{text}</Text>
-      <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
+      <View
+        style={{flexDirection: 'row', alignSelf: 'flex-end', marginTop: 10}}>
         <Text style={styles.date}>{date}</Text>
         {isMyMessage && (
           <Icon
@@ -57,6 +58,7 @@ export default function Message({
             name="checkmark-done-outline"
             color={'#669da0'}
             size={16}
+            style={{marginLeft: 5}}
           />
         )}
       </View>
