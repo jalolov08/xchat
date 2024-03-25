@@ -3,13 +3,13 @@ import ChatStack from '../ChatStack/chat.stack';
 import Icon, {Icons} from '../../ui/Icon/icon.ui'; // Assuming Icon component imports icons
 import ContactStack from '../ContactStack/contact.stack';
 import SettingsStack from '../SettingsStack/settings.stack';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
-import { useScheme } from '../../contexts/ThemeContext/theme.context';
+import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
+import {useScheme} from '../../contexts/ThemeContext/theme.context';
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
-  const {colors} = useScheme()
+  const {colors} = useScheme();
   const tabConfigs = [
     {
       name: 'ContactsStack',
@@ -27,13 +27,7 @@ export default function TabNavigator() {
       icon: 'gear',
     },
   ];
-  const visibleRoutes = [
-    'AdDetails',
-    'Category',
-    'SelectBrand',
-    'SelectModel',
-    'SelectCity',
-  ];
+  const visibleRoutes = ['Chat', 'AboutContact', 'EditContact'];
 
   const getTabBarVisibility = route => {
     const routeName = getFocusedRouteNameFromRoute(route);
@@ -50,13 +44,13 @@ export default function TabNavigator() {
       screenOptions={{
         headerShown: false,
       }}
-          initialRouteName='Login'>
+      initialRouteName="Login">
       {tabConfigs.map(tabConfig => (
         <Tab.Screen
           key={tabConfig.name}
           name={tabConfig.name}
           component={tabConfig.component}
-          options={{
+          options={({route}) => ({
             tabBarShowLabel: false,
             tabBarIcon: ({focused, size}) => (
               <Icon
@@ -71,8 +65,9 @@ export default function TabNavigator() {
               borderTopColor: colors.border,
               borderTopWidth: 1,
               paddingHorizontal: 70,
+              display: getTabBarVisibility(route),
             },
-          }}
+          })}
         />
       ))}
     </Tab.Navigator>

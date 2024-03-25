@@ -31,7 +31,7 @@ export default function HeaderBack({
     title: {
       fontSize: 22,
       color: colors.primary,
-      marginLeft: 10,
+      marginLeft: 15,
       fontWeight:'600'
     },
   });
@@ -43,7 +43,7 @@ export default function HeaderBack({
             type={Icons.Ionicons}
             name="arrow-back-outline"
             color={colors.primary}
-            size={28}
+            size={24}
           />
         </Pressable>
       )}

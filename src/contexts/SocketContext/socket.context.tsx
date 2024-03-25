@@ -18,18 +18,16 @@ export const SocketProvider = ({children}) => {
   const {authState} = useAuth();
   const {setChats} = useChats();
   useEffect(() => {
-    if (authState) {
-      console.log(authState?.token);
-      
+    if (authState && authState.authenticated) {
       const socket = io(API, {
         query: {
-          token: authState?.token,
+          "token": authState?.token,
         },
       });
       setSocket(socket);
       socket.on('chats', chats => {
         console.log(chats);
-        
+
         setChats(chats);
       });
       return () => socket.close();
