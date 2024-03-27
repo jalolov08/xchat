@@ -17,27 +17,53 @@ export const SocketProvider = ({children}) => {
   const [socket, setSocket] = useState(null);
   const {authState} = useAuth();
   const {setChats} = useChats();
+
+  const connectSocket = () => {
+    const newSocket = io(API, {
+      query: {
+        token: authState?.token,
+      },
+    });
+
+    newSocket.on('chats', chats => {
+      console.log(chats);
+      setChats(chats);
+    });
+
+    setSocket(newSocket);
+  };
+
   useEffect(() => {
     if (authState && authState.authenticated) {
-      const socket = io(API, {
-        query: {
-          "token": authState?.token,
-        },
-      });
-      setSocket(socket);
-      socket.on('chats', chats => {
-        console.log(chats);
-
-        setChats(chats);
-      });
-      return () => socket.close();
+      connectSocket();
     } else {
       if (socket) {
         socket.close();
         setSocket(null);
       }
     }
-  }, []);
+
+    return () => {
+      if (socket) {
+        socket.close();
+        setSocket(null);
+      }
+    };
+  }, [authState]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('disconnect', () => {
+        connectSocket();
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('disconnect');
+      }
+    };
+  }, [socket]);
 
   return (
     <SocketContext.Provider value={{socket}}>{children}</SocketContext.Provider>
