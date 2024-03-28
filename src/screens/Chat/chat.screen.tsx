@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Pressable, ScrollView, TextInput, View} from 'react-native';
+import {Pressable, ScrollView, Text, TextInput, View} from 'react-native';
 import {styles as chatStyles} from './chat.style';
 import ChatHeader from '../../components/ChatHeader/chatHeader.component';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
@@ -23,13 +23,15 @@ export default function Chat({route}) {
   const {colors} = useScheme();
   const [inputHeight, setInputHeight] = useState(60);
   const scrollViewRef = useRef(null);
-  const {messages} = useMessages();
+  const {messages, getMessageById} = useMessages();
   const {authState} = useAuth();
   const [message, setMessage] = useState('');
+  const [replyId, setReplyId] = useState('');
   const {sending, error, sendMessage} = useSendMessage();
+  const [answerText, setAnswerText] = useState('');
   useEffect(() => {
     if (scrollViewRef.current && messages.length > 0) {
-      scrollViewRef.current.scrollToEnd({ animated: true });
+      scrollViewRef.current.scrollToEnd({animated: true});
     }
   }, [messages]);
   useEffect(() => {
@@ -43,17 +45,34 @@ export default function Chat({route}) {
     setInputHeight(newHeight);
   };
 
+  const handleReplyIdChange = (newReplyId:string) => {
+    setReplyId(newReplyId);
+  };
+  useEffect(() => {
+    if (replyId) {
+      const text = getMessageById(replyId)?.message;
+      setAnswerText(text);
+    }
+  }, [replyId, getMessageById]);
   const handleSubmit = async () => {
     if (!message.trim()) {
       return;
     }
 
     try {
-      await sendMessage(otherParticipant.user, {
+      const messageToSend = {
         message: message.trim(),
         messageType: 'text',
-      });
+      };
+
+      if (replyId) {
+        messageToSend.answerFor = replyId;
+      }
+
+      await sendMessage(otherParticipant.user, messageToSend);
       setMessage('');
+      setReplyId('');
+      setAnswerText('');
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -71,7 +90,7 @@ export default function Chat({route}) {
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: 'flex-end',
-            paddingBottom: 50,
+            paddingBottom: replyId ? 100 : 50,
           }}>
           {loading ? (
             <Lottie
@@ -84,53 +103,83 @@ export default function Chat({route}) {
             <>
               {messages.map((messageItem, index) => (
                 <Message
+                  id={messageItem._id}
                   key={index}
                   date={extractTime(messageItem.createdAt)}
                   text={messageItem.message}
                   isMyMessage={messageItem.senderId === authState?._id}
+                  answerFor={messageItem.answerFor}
+                  onReplyIdChange={handleReplyIdChange}
                 />
               ))}
             </>
           )}
         </ScrollView>
 
-        <View style={[styles.inputCont, {height: inputHeight}]}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Icon
-              type={Icons.Ionicons}
-              name="add-outline"
-              color={colors.placeHolder}
-              size={28}
-            />
-            <TextInput
-              style={styles.textInput}
-              placeholder="Type a message"
-              placeholderTextColor={colors.placeHolder}
-              multiline={true}
-              returnKeyType="send"
-              textAlignVertical="top"
-              value={message}
-              onChangeText={setMessage}
-              onContentSizeChange={handleContentSizeChange}
-            />
-          </View>
-          {sending ? (
-            <Icon
-              type={Icons.Ionicons}
-              name="hourglass-outline"
-              color={colors.placeHolder}
-              size={28}
-            />
-          ) : (
-            <Pressable onPress={handleSubmit}>
+        <View style={{position: 'absolute', bottom: 0}}>
+          {replyId && (
+            <View style={styles.replyCont}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Icon
+                  type={Icons.FontAwesome}
+                  name="reply"
+                  color={colors.text}
+                  size={18}
+                />
+                <Text style={styles.replyText}>{answerText}</Text>
+              </View>
+              <Pressable
+                onPress={() => {
+                  setAnswerText(''), setReplyId('');
+                }}>
+                <Icon
+                  type={Icons.Ionicons}
+                  name="close-outline"
+                  color={colors.text}
+                  size={20}
+                />
+              </Pressable>
+            </View>
+          )}
+
+          <View style={[styles.inputCont, {height: inputHeight}]}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Icon
                 type={Icons.Ionicons}
-                name="send-outline"
+                name="add-outline"
                 color={colors.placeHolder}
                 size={28}
               />
-            </Pressable>
-          )}
+              <TextInput
+                style={styles.textInput}
+                placeholder="Type a message"
+                placeholderTextColor={colors.placeHolder}
+                multiline={true}
+                returnKeyType="send"
+                textAlignVertical="top"
+                value={message}
+                onChangeText={setMessage}
+                onContentSizeChange={handleContentSizeChange}
+              />
+            </View>
+            {sending ? (
+              <Icon
+                type={Icons.Ionicons}
+                name="hourglass-outline"
+                color={colors.placeHolder}
+                size={28}
+              />
+            ) : (
+              <Pressable onPress={handleSubmit}>
+                <Icon
+                  type={Icons.Ionicons}
+                  name="send-outline"
+                  color={colors.placeHolder}
+                  size={28}
+                />
+              </Pressable>
+            )}
+          </View>
         </View>
       </View>
     </View>

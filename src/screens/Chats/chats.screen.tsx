@@ -70,7 +70,7 @@ export default function Chats() {
         onChange={setSearchQuery}
       />
       {sortedChats.length === 0 ? (
-        <Lottie source={empty} />
+        <Lottie source={empty} width={200} height={200} style={{alignSelf:'center' , marginTop:100}}/>
       ) : (
         <FlatList
           data={sortedChats}

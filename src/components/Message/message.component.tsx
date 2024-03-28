@@ -1,18 +1,63 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
 import Icon, {Icons} from '../../ui/Icon/icon.ui';
+import useMessages from '../../zustand/useMessages';
+import {
+  PanGestureHandler,
+  PanGestureHandlerGestureEvent,
+} from 'react-native-gesture-handler';
+import Animated, {
+  runOnJS,
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 
-export default function Message({
-  text,
-  isMyMessage,
-  date,
-}: {
+type TMessage = {
+  id: string;
   text: string;
   isMyMessage: boolean;
   date: string;
-}) {
+  answerFor?: string;
+  onReplyIdChange?: (replyId: string) => void
+};
+
+export default function Message({
+  id,
+  text,
+  isMyMessage,
+  date,
+  answerFor,
+  onReplyIdChange
+}: TMessage) {
   const {colors} = useScheme();
+  const {getMessageById} = useMessages();
+  const repliedMessage = answerFor ? getMessageById(answerFor) : null;
+  const translateX = useSharedValue(0);
+  const penGesture = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
+    onStart: (_, context) => {
+      context.startX = translateX.value;
+    },
+    onActive: (event, context) => {
+      const newTranslateX = context.startX + event.translationX;
+      translateX.value = Math.max(-50, Math.min(0, newTranslateX));
+    },
+    onEnd: event => {
+      if (translateX.value < -20) {
+        translateX.value = withSpring(-50, {}, () => {
+          runOnJS(onReplyIdChange)(id);
+        });
+      }
+      translateX.value = withSpring(0);
+    },
+  });
+
+  const viewStyle = useAnimatedStyle(() => ({
+    transform: [{translateX: translateX.value}],
+  }));
+
   const borderRadiusStyle = isMyMessage
     ? {
         borderTopLeftRadius: 12,
@@ -24,6 +69,7 @@ export default function Message({
         borderBottomLeftRadius: 12,
         borderBottomRightRadius: 12,
       };
+
   const styles = StyleSheet.create({
     container: {
       alignSelf: isMyMessage ? 'flex-end' : 'flex-start',
@@ -34,8 +80,9 @@ export default function Message({
 
       marginVertical: 5,
       marginHorizontal: 16,
-      padding: 10,
       maxWidth: '85%',
+      minWidth: '30%',
+      padding: 10,
     },
     message: {
       color: isMyMessage ? '#fff' : colors.text,
@@ -45,23 +92,45 @@ export default function Message({
       fontSize: 13,
       color: '#669da0',
     },
+    replyCont: {
+      backgroundColor: isMyMessage
+        ? colors.messageReceiver
+        : colors.messageSender,
+      padding: 8,
+      marginBottom: 5,
+      borderRadius: 8,
+      borderLeftColor: '#fff',
+      borderLeftWidth: 2,
+    },
+    answerText: {
+      fontSize: 14,
+      color: '#fff',
+    },
   });
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.message}>{text}</Text>
-      <View
-        style={{flexDirection: 'row', alignSelf: 'flex-end', marginTop: 10}}>
-        <Text style={styles.date}>{date}</Text>
-        {isMyMessage && (
-          <Icon
-            type={Icons.Ionicons}
-            name="checkmark-done-outline"
-            color={'#669da0'}
-            size={16}
-            style={{marginLeft: 5}}
-          />
+    <PanGestureHandler onGestureEvent={penGesture}>
+      <Animated.View style={[styles.container, viewStyle]}>
+        {answerFor && (
+          <View style={styles.replyCont}>
+            <Text style={styles.answerText} numberOfLines={1}>{repliedMessage?.message}</Text>
+          </View>
         )}
-      </View>
-    </View>
+        <Text style={styles.message}>{text}</Text>
+        <View
+          style={{flexDirection: 'row', alignSelf: 'flex-end', marginTop: 10}}>
+          <Text style={styles.date}>{date}</Text>
+          {isMyMessage && (
+            <Icon
+              type={Icons.Ionicons}
+              name="checkmark-done-outline"
+              color={'#669da0'}
+              size={16}
+              style={{marginLeft: 5}}
+            />
+          )}
+        </View>
+      </Animated.View>
+    </PanGestureHandler>
   );
 }
