@@ -37,7 +37,6 @@ function Message({
   const {getMessageById} = useMessages();
   const repliedMessage = answerFor ? getMessageById(answerFor) : null;
   const translateX = useSharedValue(0);
-  const [firstSelectionDone, setFirstSelectionDone] = useState(false);
   const {selectItem, selectedItems, deselectItem, clearSelection} = useSelect();
   const isSelect = selectedItems.includes(id);
   const penGesture = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
@@ -126,7 +125,6 @@ function Message({
 
   const handleLongPress = () => {
     selectItem(id);
-    setFirstSelectionDone(true);
   };
 
   return (
@@ -134,6 +132,7 @@ function Message({
       onPress={handlePress}
       onLongPress={handleLongPress}
       android_disableSound={true}
+      key={id}
       style={{
         backgroundColor: isSelect ? 'hsla(182, 100%, 19%, 0.2)' : 'transparent',
       }}>

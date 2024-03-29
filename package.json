@@ -21,6 +21,7 @@
     "react-native-check-box": "^2.1.7",
     "react-native-confirmation-code-field": "^7.3.2",
     "react-native-contacts": "^7.0.8",
+    "react-native-document-picker": "^9.1.1",
     "react-native-gesture-handler": "^2.16.0",
     "react-native-image-picker": "^7.1.0",
     "react-native-linear-gradient": "^2.8.3",

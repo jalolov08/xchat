@@ -23,6 +23,16 @@ import useListenMessages from '../../hooks/useListenMessages';
 import ChatHeaderSelected from '../../components/ChatHeaderSelected/chatHeaderSelected.component';
 import useSelect from '../../zustand/useSelect';
 import {useFocusEffect} from '@react-navigation/native';
+import DocumentPicker from 'react-native-document-picker';
+import MessageImage from '../../components/MessageImage/messageImage.component';
+import MessageModal from '../../components/MessageModal/messageModal.component';
+
+type PickedDocument = {
+  uri: string;
+  type: string;
+  name: string;
+  size:number
+};
 
 export default function Chat({route}) {
   useListenMessages();
@@ -39,6 +49,38 @@ export default function Chat({route}) {
   const {sending, sendMessage} = useSendMessage();
   const [answerText, setAnswerText] = useState('');
   const {selectedItems, clearSelection} = useSelect();
+  const [pickedDocument, setPickedDocument] = useState<
+    PickedDocument | undefined
+  >();
+  const [visible, setVisible] = React.useState(false);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+  const pickDocument = async () => {
+    try {
+      const res = await DocumentPicker.pick({
+        type: [
+          DocumentPicker.types.images,
+          DocumentPicker.types.pdf,
+          DocumentPicker.types.xls,
+          DocumentPicker.types.plainText,
+          DocumentPicker.types.ppt,
+          DocumentPicker.types.doc,
+          DocumentPicker.types.docx,
+        ],
+      });
+
+      setPickedDocument(res[0]);
+
+      showModal();
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        console.log('User cancelled the picker');
+      } else {
+        console.log('Error :', err);
+      }
+    }
+  };
   useFocusEffect(
     React.useCallback(() => {
       let backPressCount = 0;
@@ -71,6 +113,7 @@ export default function Chat({route}) {
 
   const handleContentSizeChange = e =>
     setInputHeight(Math.min(e.nativeEvent.contentSize.height, 100));
+
   const handleReplyIdChange = (newReplyId: string) => {
     setReplyId(newReplyId);
     clearSelection();
@@ -81,24 +124,57 @@ export default function Chat({route}) {
   }, [replyId, getMessageById]);
 
   const handleSubmit = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() && !pickedDocument) return;
+
     try {
-      const messageToSend = {
-        message: message.trim(),
-        messageType: 'text',
-        ...(replyId && {answerFor: replyId}),
-      };
+      const messageToSend = new FormData();
+
+      if (message.trim()) {
+        messageToSend.append('message', message.trim());
+      }
+
+      if (pickedDocument) {
+        const documentType = pickedDocument.type.startsWith('image/')
+          ? 'image'
+          : 'document';
+
+        messageToSend.append('file', {
+          uri: pickedDocument.uri,
+          type: pickedDocument.type,
+          name: pickedDocument.name,
+        });
+
+        messageToSend.append('messageType', documentType);
+      } else {
+        messageToSend.append('messageType', 'text');
+      }
+
+      if (replyId) {
+        messageToSend.append('answerFor', replyId);
+      }
+
       await sendMessage(otherParticipant.user, messageToSend);
+
       setMessage('');
       setReplyId('');
       setAnswerText('');
+      setPickedDocument(null);
+      hideModal();
     } catch (error) {
       console.error('Error sending message:', error);
+      hideModal();
     }
   };
 
   return (
     <View style={{flex: 1}}>
+      <MessageModal
+        visible={visible}
+        hideModal={hideModal}
+        pickedDocument={pickedDocument}
+        handleSubmit={handleSubmit}
+        sending={sending}
+      />
       {selectedItems.length > 0 ? (
         <ChatHeaderSelected />
       ) : (
@@ -123,17 +199,32 @@ export default function Chat({route}) {
               style={{alignSelf: 'center', marginTop: 100}}
             />
           ) : (
-            messages.map((messageItem, index) => (
-              <Message
-                id={messageItem._id}
-                key={index}
-                date={extractTime(messageItem.createdAt)}
-                text={messageItem.message}
-                isMyMessage={messageItem.senderId === authState?._id}
-                answerFor={messageItem.answerFor}
-                onReplyIdChange={handleReplyIdChange}
-              />
-            ))
+            messages.map((messageItem, index) => {
+              if (messageItem.messageType === 'image') {
+                return (
+                  <MessageImage
+                    key={index}
+                    imageUri={messageItem.uri}
+                    id={messageItem._id}
+                    date={extractTime(messageItem.createdAt)}
+                    isMyMessage={messageItem.senderId === authState?._id}
+                    date={extractTime(messageItem.createdAt)}
+                  />
+                );
+              } else {
+                return (
+                  <Message
+                    key={index}
+                    id={messageItem._id}
+                    date={extractTime(messageItem.createdAt)}
+                    text={messageItem.message}
+                    isMyMessage={messageItem.senderId === authState?._id}
+                    answerFor={messageItem.answerFor}
+                    onReplyIdChange={handleReplyIdChange}
+                  />
+                );
+              }
+            })
           )}
         </ScrollView>
         <View style={{position: 'absolute', bottom: 0}}>
@@ -163,12 +254,14 @@ export default function Chat({route}) {
           )}
           <View style={[styles.inputCont, {height: inputHeight}]}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Icon
-                type={Icons.Ionicons}
-                name="add-outline"
-                color={colors.placeHolder}
-                size={28}
-              />
+              <Pressable onPress={pickDocument}>
+                <Icon
+                  type={Icons.Ionicons}
+                  name="add-outline"
+                  color={colors.placeHolder}
+                  size={28}
+                />
+              </Pressable>
               <TextInput
                 style={styles.textInput}
                 placeholder="Type a message"
