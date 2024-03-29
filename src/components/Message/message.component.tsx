@@ -1,5 +1,5 @@
-import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, Pressable} from 'react-native';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
 import Icon, {Icons} from '../../ui/Icon/icon.ui';
 import useMessages from '../../zustand/useMessages';
@@ -14,6 +14,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import useSelect from '../../zustand/useSelect';
 
 type TMessage = {
   id: string;
@@ -21,21 +22,24 @@ type TMessage = {
   isMyMessage: boolean;
   date: string;
   answerFor?: string;
-  onReplyIdChange?: (replyId: string) => void
+  onReplyIdChange?: (replyId: string) => void;
 };
 
-export default function Message({
+function Message({
   id,
   text,
   isMyMessage,
   date,
   answerFor,
-  onReplyIdChange
+  onReplyIdChange,
 }: TMessage) {
   const {colors} = useScheme();
   const {getMessageById} = useMessages();
   const repliedMessage = answerFor ? getMessageById(answerFor) : null;
   const translateX = useSharedValue(0);
+  const [firstSelectionDone, setFirstSelectionDone] = useState(false);
+  const {selectItem, selectedItems, deselectItem, clearSelection} = useSelect();
+  const isSelect = selectedItems.includes(id);
   const penGesture = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
     onStart: (_, context) => {
       context.startX = translateX.value;
@@ -56,6 +60,9 @@ export default function Message({
 
   const viewStyle = useAnimatedStyle(() => ({
     transform: [{translateX: translateX.value}],
+    backgroundColor: isMyMessage
+      ? colors.messageSender
+      : colors.messageReceiver,
   }));
 
   const borderRadiusStyle = isMyMessage
@@ -107,30 +114,59 @@ export default function Message({
       color: '#fff',
     },
   });
+  const handlePress = () => {
+    if (isSelect) {
+      deselectItem(id);
+    } else {
+      if (selectedItems.length > 0) {
+        selectItem(id);
+      }
+    }
+  };
+
+  const handleLongPress = () => {
+    selectItem(id);
+    setFirstSelectionDone(true);
+  };
 
   return (
-    <PanGestureHandler onGestureEvent={penGesture}>
-      <Animated.View style={[styles.container, viewStyle]}>
-        {answerFor && (
-          <View style={styles.replyCont}>
-            <Text style={styles.answerText} numberOfLines={1}>{repliedMessage?.message}</Text>
-          </View>
-        )}
-        <Text style={styles.message}>{text}</Text>
-        <View
-          style={{flexDirection: 'row', alignSelf: 'flex-end', marginTop: 10}}>
-          <Text style={styles.date}>{date}</Text>
-          {isMyMessage && (
-            <Icon
-              type={Icons.Ionicons}
-              name="checkmark-done-outline"
-              color={'#669da0'}
-              size={16}
-              style={{marginLeft: 5}}
-            />
+    <Pressable
+      onPress={handlePress}
+      onLongPress={handleLongPress}
+      android_disableSound={true}
+      style={{
+        backgroundColor: isSelect ? 'hsla(182, 100%, 19%, 0.2)' : 'transparent',
+      }}>
+      <PanGestureHandler onGestureEvent={penGesture}>
+        <Animated.View style={[styles.container, viewStyle]}>
+          {answerFor && (
+            <View style={styles.replyCont}>
+              <Text style={styles.answerText} numberOfLines={1}>
+                {repliedMessage?.message}
+              </Text>
+            </View>
           )}
-        </View>
-      </Animated.View>
-    </PanGestureHandler>
+          <Text style={styles.message}>{text}</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignSelf: 'flex-end',
+              marginTop: 10,
+            }}>
+            <Text style={styles.date}>{date}</Text>
+            {isMyMessage && (
+              <Icon
+                type={Icons.Ionicons}
+                name="checkmark-done-outline"
+                color={'#669da0'}
+                size={16}
+                style={{marginLeft: 5}}
+              />
+            )}
+          </View>
+        </Animated.View>
+      </PanGestureHandler>
+    </Pressable>
   );
 }
+export default React.memo(Message);

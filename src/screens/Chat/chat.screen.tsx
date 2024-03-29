@@ -1,5 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Pressable, ScrollView, Text, TextInput, View} from 'react-native';
+import {
+  BackHandler,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import {styles as chatStyles} from './chat.style';
 import ChatHeader from '../../components/ChatHeader/chatHeader.component';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
@@ -11,9 +18,11 @@ import {useAuth} from '../../contexts/AuthContext/auth.context';
 import Lottie from '../../ui/Lottie/lottie.ui';
 import chatLoader from '../../assets/animations/chat_loader.json';
 import useSendMessage from '../../hooks/useSendMessage';
-import {formatDate} from '../../utils/formatDate';
 import {extractTime} from '../../utils/extractTime';
 import useListenMessages from '../../hooks/useListenMessages';
+import ChatHeaderSelected from '../../components/ChatHeaderSelected/chatHeaderSelected.component';
+import useSelect from '../../zustand/useSelect';
+import {useFocusEffect} from '@react-navigation/native';
 
 export default function Chat({route}) {
   useListenMessages();
@@ -22,53 +31,63 @@ export default function Chat({route}) {
   const styles = chatStyles();
   const {colors} = useScheme();
   const [inputHeight, setInputHeight] = useState(60);
-  const scrollViewRef = useRef(null);
+  const scrollViewRef = useRef<ScrollView>(null);
   const {messages, getMessageById} = useMessages();
   const {authState} = useAuth();
   const [message, setMessage] = useState('');
   const [replyId, setReplyId] = useState('');
-  const {sending, error, sendMessage} = useSendMessage();
+  const {sending, sendMessage} = useSendMessage();
   const [answerText, setAnswerText] = useState('');
-  useEffect(() => {
-    if (scrollViewRef.current && messages.length > 0) {
-      scrollViewRef.current.scrollToEnd({animated: true});
-    }
-  }, [messages]);
+  const {selectedItems, clearSelection} = useSelect();
+  useFocusEffect(
+    React.useCallback(() => {
+      let backPressCount = 0;
+
+      const onBackPress = () => {
+        if (selectedItems.length > 0 && backPressCount === 0) {
+          clearSelection();
+          backPressCount++;
+          return true;
+        } else {
+          return false;
+        }
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+
+      return () => {
+        backHandler.remove();
+      };
+    }, [clearSelection, selectedItems]),
+  );
   useEffect(() => {
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({animated: false});
+      scrollViewRef.current.scrollToEnd({animated: messages.length > 0});
     }
-  }, [inputHeight]);
+  }, [messages, inputHeight]);
 
-  const handleContentSizeChange = e => {
-    const newHeight = Math.min(e.nativeEvent.contentSize.height, 100);
-    setInputHeight(newHeight);
-  };
-
-  const handleReplyIdChange = (newReplyId:string) => {
+  const handleContentSizeChange = e =>
+    setInputHeight(Math.min(e.nativeEvent.contentSize.height, 100));
+  const handleReplyIdChange = (newReplyId: string) => {
     setReplyId(newReplyId);
+    clearSelection();
   };
-  useEffect(() => {
-    if (replyId) {
-      const text = getMessageById(replyId)?.message;
-      setAnswerText(text);
-    }
-  }, [replyId, getMessageById]);
-  const handleSubmit = async () => {
-    if (!message.trim()) {
-      return;
-    }
 
+  useEffect(() => {
+    if (replyId) setAnswerText(getMessageById(replyId)?.message || '');
+  }, [replyId, getMessageById]);
+
+  const handleSubmit = async () => {
+    if (!message.trim()) return;
     try {
       const messageToSend = {
         message: message.trim(),
         messageType: 'text',
+        ...(replyId && {answerFor: replyId}),
       };
-
-      if (replyId) {
-        messageToSend.answerFor = replyId;
-      }
-
       await sendMessage(otherParticipant.user, messageToSend);
       setMessage('');
       setReplyId('');
@@ -80,10 +99,14 @@ export default function Chat({route}) {
 
   return (
     <View style={{flex: 1}}>
-      <ChatHeader
-        fullName={otherParticipant.fullName}
-        photo={otherParticipant.photo}
-      />
+      {selectedItems.length > 0 ? (
+        <ChatHeaderSelected />
+      ) : (
+        <ChatHeader
+          fullName={otherParticipant.fullName}
+          photo={otherParticipant.photo}
+        />
+      )}
       <View style={styles.container}>
         <ScrollView
           ref={scrollViewRef}
@@ -100,22 +123,19 @@ export default function Chat({route}) {
               style={{alignSelf: 'center', marginTop: 100}}
             />
           ) : (
-            <>
-              {messages.map((messageItem, index) => (
-                <Message
-                  id={messageItem._id}
-                  key={index}
-                  date={extractTime(messageItem.createdAt)}
-                  text={messageItem.message}
-                  isMyMessage={messageItem.senderId === authState?._id}
-                  answerFor={messageItem.answerFor}
-                  onReplyIdChange={handleReplyIdChange}
-                />
-              ))}
-            </>
+            messages.map((messageItem, index) => (
+              <Message
+                id={messageItem._id}
+                key={index}
+                date={extractTime(messageItem.createdAt)}
+                text={messageItem.message}
+                isMyMessage={messageItem.senderId === authState?._id}
+                answerFor={messageItem.answerFor}
+                onReplyIdChange={handleReplyIdChange}
+              />
+            ))
           )}
         </ScrollView>
-
         <View style={{position: 'absolute', bottom: 0}}>
           {replyId && (
             <View style={styles.replyCont}>
@@ -141,7 +161,6 @@ export default function Chat({route}) {
               </Pressable>
             </View>
           )}
-
           <View style={[styles.inputCont, {height: inputHeight}]}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Icon
