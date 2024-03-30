@@ -11,13 +11,15 @@ import useSelect from '../../zustand/useSelect';
 import {API} from '../../../config';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
 import Icon, {Icons} from '../../ui/Icon/icon.ui';
-
-const MessageImage = ({imageUri, isMyMessage, id, date}) => {
+import {TMessage} from '../MessageDocument/messageDocument.component';
+import ImageView from 'react-native-lightbox-gallery';
+const MessageImage = ({uri, isMyMessage, id, date}: TMessage) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const {selectItem, selectedItems, deselectItem, clearSelection} = useSelect();
   const isSelect = selectedItems.includes(id);
   const {colors} = useScheme();
+  const [visible, setIsVisible] = useState(false);
   const handleImageLoad = () => {
     setLoading(false);
   };
@@ -105,12 +107,22 @@ const MessageImage = ({imageUri, isMyMessage, id, date}) => {
           </TouchableOpacity>
         ) : (
           <>
-            <Image
-              style={styles.image}
-              source={{uri: `${API}${imageUri}`}}
-              onLoad={handleImageLoad}
-              onError={handleImageError}
+            <ImageView
+              images={[{uri: `${API}${uri}`}]}
+              imageIndex={0}
+              visible={visible}
+              animationType="slide"
+              swipeToCloseEnabled={true}
+              onRequestClose={() => setIsVisible(false)}
             />
+            <Pressable onPress={() => setIsVisible(true)}>
+              <Image
+                style={styles.image}
+                source={{uri: `${API}${uri}`}}
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+              />
+            </Pressable>
 
             <View
               style={{

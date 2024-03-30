@@ -5,8 +5,10 @@ import {
   ScrollView,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
+import RNFS from 'react-native-fs';
 import {styles as chatStyles} from './chat.style';
 import ChatHeader from '../../components/ChatHeader/chatHeader.component';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
@@ -26,12 +28,14 @@ import {useFocusEffect} from '@react-navigation/native';
 import DocumentPicker from 'react-native-document-picker';
 import MessageImage from '../../components/MessageImage/messageImage.component';
 import MessageModal from '../../components/MessageModal/messageModal.component';
-
+import FileViewer from 'react-native-file-viewer';
+import {API} from '../../../config';
+import MessageDocument from '../../components/MessageDocument/messageDocument.component';
 type PickedDocument = {
   uri: string;
   type: string;
   name: string;
-  size:number
+  size: number;
 };
 
 export default function Chat({route}) {
@@ -204,11 +208,20 @@ export default function Chat({route}) {
                 return (
                   <MessageImage
                     key={index}
-                    imageUri={messageItem.uri}
+                    uri={messageItem.uri}
                     id={messageItem._id}
                     date={extractTime(messageItem.createdAt)}
                     isMyMessage={messageItem.senderId === authState?._id}
                     date={extractTime(messageItem.createdAt)}
+                  />
+                );
+              } else if (messageItem.messageType === 'document') {
+                return (
+                  <MessageDocument
+                    uri={messageItem.uri}
+                    date={extractTime(messageItem.createdAt)}
+                    isMyMessage={messageItem.senderId === authState?._id}
+                    id={messageItem._id}
                   />
                 );
               } else {

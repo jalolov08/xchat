@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Modal,
   Text,
@@ -9,8 +9,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
-import file from '../../assets/file.png';
-
+import pdf from '../../assets/PDF.png';
+import doc from '../../assets/DOC.png';
+import txt from '../../assets/TXT.png';
+import docx from '../../assets/DOCX.png';
+import xsl from '../../assets/XSL.png';
+import ppt from '../../assets/PPT.png';
 type PickedDocument = {
   uri: string;
   type: string;
@@ -46,14 +50,18 @@ const MessageModal: React.FC<TMessageModal> = ({
           )}
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
-              style={[styles.button, {borderColor: colors.border ,}]}
+              style={[styles.button, {borderColor: colors.border}]}
               onPress={hideModal}>
-              <Text style={[styles.buttonText , {color:colors.text}]}>Отмена</Text>
+              <Text style={[styles.buttonText, {color: colors.text}]}>
+                Отмена
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.button, {borderColor: colors.border}]}
               onPress={handleSubmit}>
-              <Text style={[styles.buttonText , {color:colors.text}]}>Отправить</Text>
+              <Text style={[styles.buttonText, {color: colors.text}]}>
+                Отправить
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -67,19 +75,46 @@ const FilePreview: React.FC<{pickedDocument: PickedDocument; colors: any}> = ({
   pickedDocument,
   colors,
 }) => {
+  const extension = pickedDocument?.name.split('.').pop().trim();
+
+  const [fileImage, setFileImage] = useState(null);
+
+  useEffect(() => {
+    const image = getFileImage(extension);
+    setFileImage(image);
+  }, []);
+  const getFileImage = (extension: string) => {
+    switch (extension) {
+      case 'pdf':
+        return pdf;
+      case 'doc':
+      case 'docx':
+        return doc;
+      case 'txt':
+        return txt;
+      case 'xsl':
+        return xsl;
+      case 'ppt':
+        return ppt;
+      default:
+        return null;
+    }
+  };
   const fileSizeInMB = (size: number): string => {
     return (size / 1048576).toFixed(2);
   };
   return (
     <View style={styles.filePreviewContainer}>
-      <Image source={file} style={styles.fileIcon} />
+      <Image source={fileImage} style={styles.fileIcon} />
       <View>
-        <Text style={[styles.fileName, {color: colors.primary}]}>
+        <Text
+          style={[styles.fileName, {color: colors.primary}]}
+          numberOfLines={1}>
           {pickedDocument?.name}
         </Text>
         <Text style={[styles.fileSize, {color: colors.accent}]}>
           {' '}
-          Size: {fileSizeInMB(pickedDocument?.size)} MB
+          {fileSizeInMB(pickedDocument?.size)} MB
         </Text>
       </View>
     </View>
@@ -117,19 +152,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
+    padding: 10,
   },
   fileIcon: {
     width: 60,
     height: 60,
-    marginRight: 20,
+    alignSelf: 'center',
   },
   fileName: {
     fontSize: 16,
+    width: '80%',
+    alignSelf: 'center',
   },
-  fileSize: {},
+  fileSize: {
+    width: '80%',
+    alignSelf: 'center',
+  },
   buttonsContainer: {
     flexDirection: 'row',
+    width: '80%',
+
     alignSelf: 'flex-end',
     marginTop: 20,
     marginRight: 20,

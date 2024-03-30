@@ -15,7 +15,13 @@ const useSendMessage = () => {
       const response = await axios.post(
         `${API_BASE}/chat/send/${userId}`,
         messageData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
       );
+      
 
       setMessages([...messages, response.data]);
       console.log('Message sent successfully');
