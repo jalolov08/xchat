@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import RNFS from 'react-native-fs';
 import {styles as chatStyles} from './chat.style';
 import ChatHeader from '../../components/ChatHeader/chatHeader.component';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
@@ -28,9 +27,8 @@ import {useFocusEffect} from '@react-navigation/native';
 import DocumentPicker from 'react-native-document-picker';
 import MessageImage from '../../components/MessageImage/messageImage.component';
 import MessageModal from '../../components/MessageModal/messageModal.component';
-import FileViewer from 'react-native-file-viewer';
-import {API} from '../../../config';
 import MessageDocument from '../../components/MessageDocument/messageDocument.component';
+import useListenMessageViewed from '../../hooks/useListenMessageViewed';
 type PickedDocument = {
   uri: string;
   type: string;
@@ -40,6 +38,7 @@ type PickedDocument = {
 
 export default function Chat({route}) {
   useListenMessages();
+  useListenMessageViewed();
   const {otherParticipant} = route.params;
   const {loading} = useGetMessages(otherParticipant.user);
   const styles = chatStyles();
@@ -213,6 +212,8 @@ export default function Chat({route}) {
                     date={extractTime(messageItem.createdAt)}
                     isMyMessage={messageItem.senderId === authState?._id}
                     date={extractTime(messageItem.createdAt)}
+                    viewed={messageItem.viewed}
+
                   />
                 );
               } else if (messageItem.messageType === 'document') {
@@ -222,6 +223,7 @@ export default function Chat({route}) {
                     date={extractTime(messageItem.createdAt)}
                     isMyMessage={messageItem.senderId === authState?._id}
                     id={messageItem._id}
+                    viewed={messageItem.viewed}
                   />
                 );
               } else {
@@ -234,6 +236,8 @@ export default function Chat({route}) {
                     isMyMessage={messageItem.senderId === authState?._id}
                     answerFor={messageItem.answerFor}
                     onReplyIdChange={handleReplyIdChange}
+                    viewed={messageItem.viewed}
+
                   />
                 );
               }

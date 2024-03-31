@@ -15,6 +15,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import useSelect from '../../zustand/useSelect';
+import useViewMessage from '../../hooks/useViewMessage';
 
 type TMessage = {
   id: string;
@@ -23,6 +24,7 @@ type TMessage = {
   date: string;
   answerFor?: string;
   onReplyIdChange?: (replyId: string) => void;
+  viewed: boolean;
 };
 
 function Message({
@@ -32,6 +34,7 @@ function Message({
   date,
   answerFor,
   onReplyIdChange,
+  viewed,
 }: TMessage) {
   const {colors} = useScheme();
   const {getMessageById} = useMessages();
@@ -39,6 +42,10 @@ function Message({
   const translateX = useSharedValue(0);
   const {selectItem, selectedItems, deselectItem, clearSelection} = useSelect();
   const isSelect = selectedItems.includes(id);
+  const isReceiver = !isMyMessage;
+  const isViewed = viewed;
+
+  useViewMessage(id, isReceiver, isViewed);
   const penGesture = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
     onStart: (_, context) => {
       context.startX = translateX.value;
@@ -157,7 +164,7 @@ function Message({
               <Icon
                 type={Icons.Ionicons}
                 name="checkmark-done-outline"
-                color={'#669da0'}
+                color={viewed ? '#fff' : '#669da0'}
                 size={16}
                 style={{marginLeft: 5}}
               />

@@ -10,6 +10,7 @@ interface Message {
   messageType: string;
   createdAt: string;
   updatedAt: string;
+  viewed: boolean;
   __v: number;
 }
 
@@ -19,6 +20,7 @@ interface MessagesState {
   addMessage: (message: Message) => void;
   deleteMessages: (messageIds: string[]) => void;
   getMessageById: (messageId: string) => Message | undefined;
+  updateMessageById: (messageId: string, updatedMessage: Partial<Message>) => void;
 }
 
 const useMessages = create<MessagesState>((set, get) => ({
@@ -34,6 +36,15 @@ const useMessages = create<MessagesState>((set, get) => ({
   },
   getMessageById: (messageId: string) =>
     get().messages.find(message => message._id === messageId),
+  updateMessageById: (messageId: string, updatedMessage: Partial<Message>) => {
+    const messages = get().messages.map(message => {
+      if (message._id === messageId) {
+        return {...message, ...updatedMessage};
+      }
+      return message;
+    });
+    set({messages});
+  },
 }));
 
 export default useMessages;

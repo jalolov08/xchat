@@ -13,13 +13,19 @@ import {useScheme} from '../../contexts/ThemeContext/theme.context';
 import Icon, {Icons} from '../../ui/Icon/icon.ui';
 import {TMessage} from '../MessageDocument/messageDocument.component';
 import ImageView from 'react-native-lightbox-gallery';
-const MessageImage = ({uri, isMyMessage, id, date}: TMessage) => {
+import useViewMessage from '../../hooks/useViewMessage';
+const MessageImage = ({uri, isMyMessage, id, date, viewed}: TMessage) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const {selectItem, selectedItems, deselectItem, clearSelection} = useSelect();
   const isSelect = selectedItems.includes(id);
   const {colors} = useScheme();
   const [visible, setIsVisible] = useState(false);
+
+  const isReceiver = !isMyMessage;
+  const isViewed = viewed;
+
+  useViewMessage(id, isReceiver, isViewed);
   const handleImageLoad = () => {
     setLoading(false);
   };
@@ -136,7 +142,7 @@ const MessageImage = ({uri, isMyMessage, id, date}: TMessage) => {
                 <Icon
                   type={Icons.Ionicons}
                   name="checkmark-done-outline"
-                  color={'#669da0'}
+                  color={viewed ? '#fff' : '#669da0'}
                   size={16}
                   style={{marginLeft: 5}}
                 />

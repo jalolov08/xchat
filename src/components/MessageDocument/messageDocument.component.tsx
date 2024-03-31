@@ -19,6 +19,7 @@ import xsl from '../../assets/XSL.png';
 import ppt from '../../assets/PPT.png';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
 import Icon, {Icons} from '../../ui/Icon/icon.ui';
+import useViewMessage from '../../hooks/useViewMessage';
 
 const getFileImage = (extension: string) => {
   switch (extension) {
@@ -42,14 +43,18 @@ export type TMessage = {
   isMyMessage: boolean;
   id: string;
   date: string;
+  viewed: boolean;
 };
-const MessageDocument = ({uri, isMyMessage, id, date}:TMessage) => {
+const MessageDocument = ({uri, isMyMessage, id, date, viewed}: TMessage) => {
   const filename = uri.split('messages\\')[1];
   const {colors} = useScheme();
   const extension = uri.split('.').pop().trim();
   const [fileImage, setFileImage] = useState(null);
   const [downloading, setDownloading] = useState(false);
+  const isReceiver = !isMyMessage;
+  const isViewed = viewed;
 
+  useViewMessage(id, isReceiver, isViewed);
   useEffect(() => {
     const image = getFileImage(extension);
     setFileImage(image);
@@ -155,7 +160,7 @@ const MessageDocument = ({uri, isMyMessage, id, date}:TMessage) => {
               <Icon
                 type={Icons.Ionicons}
                 name="checkmark-done-outline"
-                color={'#669da0'}
+                color={viewed ? '#fff' : '#669da0'}
                 size={16}
                 style={{marginLeft: 5}}
               />
