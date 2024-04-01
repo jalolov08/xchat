@@ -1,7 +1,7 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import Chats from '../../screens/Chats/chats.screen';
+import Settings from '../../screens/Settings/settings.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -11,7 +11,7 @@ export default function SettingsStack() {
       screenOptions={{
         headerShown: false,
       }}>
-      <Stack.Screen name="Chats" component={Chats} />
+      <Stack.Screen name="Settings" component={Settings} />
     </Stack.Navigator>
   );
 }

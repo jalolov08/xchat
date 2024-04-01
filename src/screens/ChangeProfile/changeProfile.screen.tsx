@@ -13,15 +13,13 @@ import HeaderBack from '../../ui/HeaderBack/headerBack.ui';
 import userDefault from '../../assets/user.png';
 import {launchImageLibrary} from 'react-native-image-picker';
 import axios from 'axios';
-import {API_BASE} from '../../../config';
-import { useScheme } from '../../contexts/ThemeContext/theme.context';
+import {API, API_BASE} from '../../../config';
 
-export default function ChangeProfile({navigation}) {
-  const [photoUri, setPhotoUri] = useState(null);
-  const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
-  const styles = changeStyles()
-  const {colors} = useScheme()
+export default function ChangeProfile({navigation, route}) {
+  const [photoUri, setPhotoUri] = useState(API + route.params.photoUri);
+  const [name, setName] = useState(route.params.name);
+  const [surname, setSurname] = useState(route.params.surname);
+  const styles = changeStyles();
   const [photo, setPhoto] = useState({
     uri: null,
     name: null,
@@ -86,8 +84,8 @@ export default function ChangeProfile({navigation}) {
       }
 
       const uploadedPhotoUri = await uploadAvatar();
-      console.log(name , surname , uploadedPhotoUri);
-      
+      console.log(name, surname, uploadedPhotoUri);
+
       const res = await axios.post(`${API_BASE}/user/change`, {
         name,
         surname,

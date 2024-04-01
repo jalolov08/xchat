@@ -1,8 +1,8 @@
 import {StyleSheet} from 'react-native';
-import { useScheme } from '../../contexts/ThemeContext/theme.context';
+import {useScheme} from '../../contexts/ThemeContext/theme.context';
 
 export const styles = () => {
-  const {colors} = useScheme()
+  const {colors} = useScheme();
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -11,11 +11,10 @@ export const styles = () => {
     },
     title: {
       fontSize: 24,
-      color: colors.text,
+      color: colors.accent,
       fontWeight: '600',
       marginTop: 16,
     },
-
     contact: {
       paddingVertical: 15,
       flexDirection: 'row',

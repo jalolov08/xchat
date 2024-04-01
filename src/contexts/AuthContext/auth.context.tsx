@@ -7,7 +7,10 @@ interface IAuthState {
   token: string | null;
   authenticated: boolean | null;
   phone?: string | null;
-  _id?: string | null; 
+  _id?: string | null;
+  name?: string | null;
+  surname?: string | null;
+  photoUri?: string | null;
 }
 
 interface IAuth {
@@ -27,7 +30,10 @@ export const AuthProvider = ({children}: any) => {
     token: null,
     authenticated: null,
     phone: null,
-    _id:null
+    _id: null,
+    name: null,
+    surname: null,
+    photoUri: null,
   });
 
   useEffect(() => {
@@ -35,25 +41,39 @@ export const AuthProvider = ({children}: any) => {
       const token = await AsyncStorage.getItem('token');
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        const stateString = await AsyncStorage.getItem('authState');
+        if (stateString) {
+          const state: IAuthState = JSON.parse(stateString);
+          setAuthState(state);
+        }        
         try {
           const response = await axios.get(`${API_BASE}/auth/me`);
-          const { _id, phone } = response.data.user; 
+          const {_id, phone, name, surname, photoUri} = response.data.user;
           setAuthState(prevState => ({
             ...prevState,
             token: token,
             authenticated: true,
-            phone: phone,
-            _id: _id, 
+            phone,
+            _id,
+            name,
+            surname,
+            photoUri,
           }));
+          await AsyncStorage.setItem(
+            'authState',
+            JSON.stringify({
+              token: token,
+              authenticated: true,
+              phone,
+              _id,
+              name,
+              surname,
+              photoUri,
+            }),
+          );
         } catch (error) {
-          console.error('Ошибка получения данных пользователя:', error);
-          setAuthState(prevState => ({
-            ...prevState,
-            token: null,
-            authenticated: false,
-            phone: null,
-            _id: null, 
-          }));
+        console.log(error);
+        
         }
       }
     };

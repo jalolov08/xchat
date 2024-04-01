@@ -11,7 +11,7 @@ export const styles = () => {
     },
     title: {
       fontSize: 24,
-      color: colors.text,
+      color: colors.accent,
       fontWeight: '600',
       marginTop: 16,
     },
