@@ -38,6 +38,7 @@ export default function Search({ containerStyle, value, onChange }: TSearch) {
         keyboardType="default"
         value={value}
         onChangeText={onChange} 
+        style={{width:"100%"}}
       />
     </View>
   );

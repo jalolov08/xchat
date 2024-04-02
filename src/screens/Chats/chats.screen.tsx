@@ -1,12 +1,5 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Image,
-  Switch,
-} from 'react-native';
+import React, {useMemo, useState} from 'react';
+import {View, Text, FlatList, TouchableOpacity, Image} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../../contexts/AuthContext/auth.context';
 import useChats, {Chat} from '../../zustand/useChats';
@@ -28,21 +21,28 @@ export default function Chats() {
   const navigation = useNavigation();
   const {chats} = useChats();
   const {authState} = useAuth();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
   const styles = chatStyles();
 
-  const sortChatsByDate = (chats: Chat[]) => {
-    return chats.slice().sort((a, b) => {
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-    });
-  };
+  const filteredChats = useMemo(() => {
+    if (!searchQuery) return chats;
 
-  const sortedChats = sortChatsByDate(chats);
+    return chats.filter(chat => {
+      const otherParticipant = chat.participantDetails.find(
+        (participant: OtherParticipant) => participant.user !== authState?._id,
+      );
+      return otherParticipant.fullName
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+    });
+  }, [chats, authState, searchQuery]);
 
   const renderItem = ({item}: {item: Chat}) => {
     const otherParticipant = item.participantDetails.find(
       (participant: OtherParticipant) => participant.user !== authState?._id,
     );
+
     return (
       <TouchableOpacity
         style={styles.chatCont}
@@ -69,11 +69,16 @@ export default function Chats() {
         value={searchQuery}
         onChange={setSearchQuery}
       />
-      {sortedChats.length === 0 ? (
-        <Lottie source={empty} width={200} height={200} style={{alignSelf:'center' , marginTop:100}}/>
+      {filteredChats.length === 0 ? (
+        <Lottie
+          source={empty}
+          width={200}
+          height={200}
+          style={{alignSelf: 'center', marginTop: 100}}
+        />
       ) : (
         <FlatList
-          data={sortedChats}
+          data={filteredChats}
           renderItem={renderItem}
           keyExtractor={item => item._id}
         />

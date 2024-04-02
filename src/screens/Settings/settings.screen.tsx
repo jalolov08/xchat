@@ -9,12 +9,15 @@ import {API} from '../../../config';
 export default function Settings({navigation}) {
   const styles = settingsStyle();
   const {colors, setScheme, dark} = useScheme();
-  const {authState} = useAuth();
+  const {authState, onLogout} = useAuth();
   const toggleDarkMode = () => {
     const newScheme = dark ? 'light' : 'dark';
     setScheme(newScheme);
   };
-
+  const handleLogout = async () => {
+    await onLogout();
+    navigation.navigate('Login');
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -65,7 +68,7 @@ export default function Settings({navigation}) {
           color={colors.accent}
         />
       </Pressable>
-      <Pressable style={styles.settingsCont}>
+      <Pressable style={styles.settingsCont} onPress={handleLogout}>
         <Text style={[styles.settingsText, {color: '#CF2A2A'}]}>Выйти </Text>
         <Icon
           type={Icons.Ionicons}

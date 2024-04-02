@@ -4,6 +4,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Contacts from '../../screens/Contacts/contacts.screen';
 import AboutContact from '../../screens/AboutContact/aboutContact.screen';
 import EditContact from '../../screens/EditContact/editContact.screen';
+import Chat from '../../screens/Chat/chat.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +17,8 @@ export default function ContactStack() {
       <Stack.Screen name="Contacts" component={Contacts} />
       <Stack.Screen name="AboutContact" component={AboutContact} />
       <Stack.Screen name="EditContact" component={EditContact} />
+      <Stack.Screen name='Chat' component={Chat} />
+
     </Stack.Navigator>
   );
 }

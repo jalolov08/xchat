@@ -11,16 +11,18 @@ import contact from '../../assets/animations/contact.json';
 import errorLoad from '../../assets/animations/error.json';
 import empty from '../../assets/animations/empty.json';
 import useContactStore from '../../zustand/useContacts';
-import { useScheme } from '../../contexts/ThemeContext/theme.context';
+import {useScheme} from '../../contexts/ThemeContext/theme.context';
+import {useGetBlockedUsers} from '../../hooks/useGetBlockedUsers';
 
 export default function ContactsScreen({navigation}) {
+  useGetBlockedUsers();
   const {contactList, setContactList} = useContactStore();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<TUser[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const styles = contactsStyles();
-  const {colors} = useScheme()
+  const {colors} = useScheme();
   useEffect(() => {
     const fetchContacts = async () => {
       try {

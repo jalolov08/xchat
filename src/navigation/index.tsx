@@ -4,6 +4,7 @@ import TabNavigator from './TabBar/TabBar';
 import AuthStack from './AuthStack/auth.stack';
 import {useAuth} from '../contexts/AuthContext/auth.context';
 import ChangeProfile from '../screens/ChangeProfile/changeProfile.screen';
+import Login from '../screens/Login/login.screen';
 const Stack = createNativeStackNavigator();
 
 export default function MainStack() {
@@ -21,6 +22,7 @@ export default function MainStack() {
         <Stack.Screen name="AuthStack" component={AuthStack} />
       )}
       <Stack.Screen name="ChangeProfile" component={ChangeProfile} />
+      <Stack.Screen name="Login" component={Login} />
     </Stack.Navigator>
   );
 }

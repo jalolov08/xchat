@@ -18,6 +18,7 @@ interface IAuth {
   onLogin?: (phone: string) => Promise<any>;
   onVerify?: (code: string) => Promise<any>;
   onLogout?: () => Promise<void>;
+  
 }
 
 const AuthContext = createContext<IAuth>({});
@@ -121,6 +122,7 @@ export const AuthProvider = ({children}: any) => {
 
   const logout = async () => {
     await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('authState');
     axios.defaults.headers.common['Authorization'] = '';
   };
 

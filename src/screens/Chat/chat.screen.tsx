@@ -201,6 +201,8 @@ export default function Chat({route}) {
               height={200}
               style={{alignSelf: 'center', marginTop: 100}}
             />
+          ) : messages.length === 0 ? (
+            <Text style={{alignSelf:'center' , fontSize:16 , color:colors.text}}>У вас пока нет сообщений.</Text>
           ) : (
             messages.map((messageItem, index) => {
               if (messageItem.messageType === 'image') {
@@ -213,7 +215,6 @@ export default function Chat({route}) {
                     isMyMessage={messageItem.senderId === authState?._id}
                     date={extractTime(messageItem.createdAt)}
                     viewed={messageItem.viewed}
-
                   />
                 );
               } else if (messageItem.messageType === 'document') {
@@ -237,7 +238,6 @@ export default function Chat({route}) {
                     answerFor={messageItem.answerFor}
                     onReplyIdChange={handleReplyIdChange}
                     viewed={messageItem.viewed}
-
                   />
                 );
               }
