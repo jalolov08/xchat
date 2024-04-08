@@ -13,6 +13,8 @@ import empty from '../../assets/animations/empty.json';
 import useContactStore from '../../zustand/useContacts';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
 import {useGetBlockedUsers} from '../../hooks/useGetBlockedUsers';
+import {useUploadContacts} from '../../hooks/useUploadContacts';
+import {Contact} from '../../types/contact.type';
 
 export default function ContactsScreen({navigation}) {
   useGetBlockedUsers();
@@ -22,11 +24,14 @@ export default function ContactsScreen({navigation}) {
   const [users, setUsers] = useState<TUser[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const styles = contactsStyles();
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const {uploadContacts} = useUploadContacts();
   const {colors} = useScheme();
   useEffect(() => {
     const fetchContacts = async () => {
       try {
         const contacts = await getContacts();
+        setContacts(contacts);
         const allNumbers = contacts.reduce((numbers, contact) => {
           const contactNumbers = contact.phoneNumbers.map(
             phoneNumber => phoneNumber.number,
@@ -44,6 +49,17 @@ export default function ContactsScreen({navigation}) {
 
     fetchContacts();
   }, [contactList]);
+  useEffect(() => {
+    const handleUploadContacts = async () => {
+      try {
+        const response = await uploadContacts(contacts);
+        console.log('Contacts uploaded successfully:', response);
+      } catch (error) {
+        console.error('Failed to upload contacts:', error);
+      }
+    };
+    handleUploadContacts();
+  }, []);
 
   async function syncContacts(contacts: string[]) {
     try {

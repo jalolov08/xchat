@@ -16,7 +16,7 @@ import axios from 'axios';
 import {API, API_BASE} from '../../../config';
 
 export default function ChangeProfile({navigation, route}) {
-  const [photoUri, setPhotoUri] = useState(API + route.params.photoUri);
+  const [photoUri, setPhotoUri] = useState(API + route.params.photoUri || '');
   const [name, setName] = useState(route.params.name);
   const [surname, setSurname] = useState(route.params.surname);
   const styles = changeStyles();
