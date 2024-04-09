@@ -6,6 +6,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import Icon, {Icons} from '../../ui/Icon/icon.ui';
 import {useAuth} from '../../contexts/AuthContext/auth.context';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
+import useFcmTokenUpload from '../../hooks/useFcmTokenUpload';
 const CELL_COUNT = 6;
 
 export default function Verify({navigation}) {
@@ -13,9 +14,12 @@ export default function Verify({navigation}) {
   const {onVerify, authState} = useAuth();
   const styles = verifyStyles();
   const {colors} = useScheme();
+  const {uploadToken} = useFcmTokenUpload();
   const handleVerify = async () => {
     const result = await onVerify(code);
     if (result.data.token) {
+      await uploadToken();
+
       navigation.navigate('ChangeProfile');
     } else {
       Alert.alert(result.data.error);

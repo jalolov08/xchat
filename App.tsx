@@ -1,6 +1,6 @@
 import {BackHandler, AppState, StyleSheet, View, Platform} from 'react-native';
 import React, {useState, useEffect} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {AuthProvider} from './src/contexts/AuthContext/auth.context';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import MainStack from './src/navigation/index';
@@ -13,10 +13,16 @@ import {
   enableSecureView,
   forbidAndroidShare,
 } from 'react-native-prevent-screenshot-ios-android';
+import {getFcmToken} from './src/utils/getFcmToken';
+import {requestUserPermission} from './src/utils/requestUserPermission';
+import {registerNotificationListener} from './src/utils/notificationListner';
+
 const RootStack = createNativeStackNavigator();
 
 export default function App() {
   useEffect(() => {
+    getFcmToken();
+    requestUserPermission();
     if (Platform.OS === 'android') {
       forbidAndroidShare();
     }
@@ -67,13 +73,23 @@ export default function App() {
         <SocketProvider>
           <GestureHandlerRootView>
             <NavigationContainer>
-              <MainStack />
+              <AppContent />
             </NavigationContainer>
           </GestureHandlerRootView>
         </SocketProvider>
       </AuthProvider>
     </ThemeProvider>
   );
+}
+
+function AppContent() {
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    registerNotificationListener(navigation);
+  }, [navigation]);
+
+  return <MainStack />;
 }
 
 const styles = StyleSheet.create({
