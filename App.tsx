@@ -16,10 +16,12 @@ import {
 import {getFcmToken} from './src/utils/getFcmToken';
 import {requestUserPermission} from './src/utils/requestUserPermission';
 import {registerNotificationListener} from './src/utils/notificationListner';
+import SplashScreen from './src/ui/SplashScreen/splashscreen.ui';
 
 const RootStack = createNativeStackNavigator();
 
 export default function App() {
+  const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {
     getFcmToken();
     requestUserPermission();
@@ -72,9 +74,13 @@ export default function App() {
       <AuthProvider>
         <SocketProvider>
           <GestureHandlerRootView>
-            <NavigationContainer>
-              <AppContent />
-            </NavigationContainer>
+            {isInitialized ? (
+              <NavigationContainer>
+                <AppContent />
+              </NavigationContainer>
+            ) : (
+              <SplashScreen onAnimationFinish={() => setIsInitialized(true)} />
+            )}
           </GestureHandlerRootView>
         </SocketProvider>
       </AuthProvider>
