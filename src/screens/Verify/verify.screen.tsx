@@ -20,7 +20,11 @@ export default function Verify({navigation}) {
     if (result.data.token) {
       await uploadToken();
 
-      navigation.navigate('ChangeProfile');
+      navigation.navigate('ChangeProfile', {
+        name: null,
+        surname: null,
+        photoUri: null,
+      });
     } else {
       Alert.alert(result.data.error);
       setCode('');

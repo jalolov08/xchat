@@ -48,10 +48,11 @@ export default function ContactsScreen({navigation}) {
     };
 
     fetchContacts();
-  }, [contactList]);
+  }, []);
   useEffect(() => {
     const handleUploadContacts = async () => {
       try {
+
         const response = await uploadContacts(contacts);
         console.log('Contacts uploaded successfully:', response);
       } catch (error) {
@@ -59,7 +60,7 @@ export default function ContactsScreen({navigation}) {
       }
     };
     handleUploadContacts();
-  }, []);
+  }, [contacts]);
 
   async function syncContacts(contacts: string[]) {
     try {

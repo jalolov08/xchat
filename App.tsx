@@ -1,4 +1,11 @@
-import {BackHandler, AppState, StyleSheet, View, Platform} from 'react-native';
+import {
+  BackHandler,
+  AppState,
+  StyleSheet,
+  View,
+  Platform,
+  PermissionsAndroid,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {AuthProvider} from './src/contexts/AuthContext/auth.context';
@@ -23,6 +30,17 @@ const RootStack = createNativeStackNavigator();
 export default function App() {
   const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {
+    const checkApplicationPermission = async () => {
+      if (Platform.OS === 'android') {
+        try {
+          await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+          );
+        } catch (error) {
+        }
+      }
+    };
+    checkApplicationPermission()
     getFcmToken();
     requestUserPermission();
     if (Platform.OS === 'android') {

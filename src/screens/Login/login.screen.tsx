@@ -13,7 +13,9 @@ export default function Login({navigation}) {
   const {colors} = useScheme();
   const styles = loginStyles();
   const handleLogin = async () => {
-    const result = await onLogin(phone);
+    const sanitizedValue = phone.replace(/[()\s-]/g, '');
+    
+    const result = await onLogin(sanitizedValue);
     if (result.error) {
       Alert.alert(result.msg);
     } else {
