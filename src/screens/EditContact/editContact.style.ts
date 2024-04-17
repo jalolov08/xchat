@@ -20,6 +20,7 @@ export const styles = () => {
       borderRadius: 30,
     },
     contactName: {
+      paddingRight: 40,
       fontSize: 24,
       fontWeight: '600',
       color: colors.text,

@@ -18,7 +18,7 @@ interface IAuth {
   onLogin?: (phone: string) => Promise<any>;
   onVerify?: (code: string) => Promise<any>;
   onLogout?: () => Promise<void>;
-  
+  setAuthState?: (newState: IAuthState) => void;
 }
 
 const AuthContext = createContext<IAuth>({});
@@ -46,7 +46,7 @@ export const AuthProvider = ({children}: any) => {
         if (stateString) {
           const state: IAuthState = JSON.parse(stateString);
           setAuthState(state);
-        }        
+        }
         try {
           const response = await axios.get(`${API_BASE}/auth/me`);
           const {_id, phone, name, surname, photoUri} = response.data.user;
@@ -73,8 +73,7 @@ export const AuthProvider = ({children}: any) => {
             }),
           );
         } catch (error) {
-        console.log(error);
-        
+          console.log(error);
         }
       }
     };
@@ -128,6 +127,7 @@ export const AuthProvider = ({children}: any) => {
 
   const value = {
     authState,
+    setAuthState,
     onLogin: login,
     onVerify: verify,
     onLogout: logout,

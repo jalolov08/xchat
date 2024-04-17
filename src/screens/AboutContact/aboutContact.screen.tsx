@@ -26,6 +26,7 @@ export default function AboutContact({route, navigation}) {
     fullName: `${user.name} ${user.surname}`,
     photo: user.photoUri,
     user: user._id,
+    phone:user.phone
   };
   const handleChatDelete = async () => {
     try {
@@ -55,7 +56,9 @@ export default function AboutContact({route, navigation}) {
           style={styles.contactPhoto}
         />
         <View style={{marginLeft: 12}}>
-          <Text style={styles.contactName}>{contact.displayName}</Text>
+          <Text style={styles.contactName} numberOfLines={1}>
+            {contact.displayName}
+          </Text>
           <Text style={styles.contactPhone}>
             {contact.phoneNumbers[0].number}
           </Text>

@@ -1,8 +1,8 @@
 import {StyleSheet} from 'react-native';
-import { useScheme } from '../../contexts/ThemeContext/theme.context';
+import {useScheme} from '../../contexts/ThemeContext/theme.context';
 
 export const styles = () => {
-  const {colors} = useScheme()
+  const {colors} = useScheme();
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -27,6 +27,16 @@ export const styles = () => {
       color: colors.text,
       borderBottomColor: colors.border,
       borderBottomWidth: 1,
+    },
+    loaderContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
   });
 };

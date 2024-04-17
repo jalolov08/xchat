@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {styles as changeStyles} from './changeProfile.style';
 import HeaderBack from '../../ui/HeaderBack/headerBack.ui';
@@ -14,6 +15,8 @@ import userDefault from '../../assets/user.png';
 import {launchImageLibrary} from 'react-native-image-picker';
 import axios from 'axios';
 import {API, API_BASE} from '../../../config';
+import {useAuth} from '../../contexts/AuthContext/auth.context';
+import {useScheme} from '../../contexts/ThemeContext/theme.context';
 
 export default function ChangeProfile({navigation, route}) {
   const [photoUri, setPhotoUri] = useState(
@@ -29,6 +32,9 @@ export default function ChangeProfile({navigation, route}) {
     type: null,
     size: null,
   });
+  const {authState, setAuthState} = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const {colors} = useScheme();
 
   const ImagePicker = async () => {
     let options = {
@@ -49,12 +55,8 @@ export default function ChangeProfile({navigation, route}) {
   };
 
   async function uploadAvatar() {
+    setIsLoading(true);
     try {
-      if (!photoUri) {
-        console.error('No file selected.');
-        return;
-      }
-
       let formData = new FormData();
       formData.append('image', {
         uri: photo.uri,
@@ -76,28 +78,43 @@ export default function ChangeProfile({navigation, route}) {
       return response.data.url;
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   const handleSaveChanges = async () => {
     try {
       if (!name) {
-        Alert.alert('Please enter your name');
+        Alert.alert('Пожалуйста введите своё имя.');
         return;
       }
 
-      const uploadedPhotoUri = await uploadAvatar();
-      console.log(name, surname, uploadedPhotoUri);
+      let uploadedPhotoUri = authState?.photoUri;
+
+      if (photo.uri) {
+        uploadedPhotoUri = await uploadAvatar();
+      }
+
+      setIsLoading(true);
 
       const res = await axios.post(`${API_BASE}/user/change`, {
         name,
         surname,
         photoUri: uploadedPhotoUri,
       });
+      setAuthState({
+        ...authState,
+        name: name,
+        surname: surname,
+        photoUri: uploadedPhotoUri,
+      });
 
       navigation.navigate('Home');
     } catch (error) {
       console.error(error.response.data);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -138,6 +155,11 @@ export default function ChangeProfile({navigation, route}) {
           </View>
         </View>
       </ScrollView>
+      {isLoading && (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      )}
     </View>
   );
 }

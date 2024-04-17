@@ -54,7 +54,7 @@ export default function ContactsScreen({navigation}) {
       try {
 
         const response = await uploadContacts(contacts);
-        console.log('Contacts uploaded successfully:', response);
+        console.log(response);
       } catch (error) {
         console.error('Failed to upload contacts:', error);
       }

@@ -1,8 +1,31 @@
 import {create} from 'zustand';
 
-type Contact = {
+type PhoneNumber = {
+  number: string;
+  label?: string;
+};
+
+export type Contact = {
   recordID: string;
-  // Другие свойства контакта
+  company: string;
+  department: string;
+  displayName: string;
+  emailAddresses: string[];
+  familyName: string;
+  givenName: string;
+  hasThumbnail: boolean;
+  imAddresses: string[];
+  isStarred: boolean;
+  jobTitle: string;
+  middleName: string;
+  note: string;
+  phoneNumbers: PhoneNumber[];
+  postalAddresses: string[];
+  prefix: string | null;
+  rawContactId: string;
+  suffix: string | null;
+  thumbnailPath: string;
+  urlAddresses: string[];
 };
 
 type ContactStore = {

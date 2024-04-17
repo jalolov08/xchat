@@ -38,6 +38,10 @@ export default function Chats() {
     });
   }, [chats, authState, searchQuery]);
 
+  filteredChats.sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+  );
+
   const renderItem = ({item}: {item: Chat}) => {
     const otherParticipant = item.participantDetails.find(
       (participant: OtherParticipant) => participant.user !== authState?._id,

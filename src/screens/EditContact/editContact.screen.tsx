@@ -1,25 +1,19 @@
 import React, {useState, useEffect} from 'react';
-import {
-  Image,
-  PermissionsAndroid,
-  Platform,
-  Text,
-  View,
-} from 'react-native';
+import {Image, PermissionsAndroid, Platform, Text, View} from 'react-native';
 import HeaderBack from '../../ui/HeaderBack/headerBack.ui';
 import {API} from '../../../config';
 import {TextInput} from 'react-native-paper';
 import Contacts from 'react-native-contacts';
 import useContactStore from '../../zustand/useContacts';
 import {styles as editStyles} from './editContact.style';
-import { useScheme } from '../../contexts/ThemeContext/theme.context';
+import {useScheme} from '../../contexts/ThemeContext/theme.context';
 const EditContact = ({route, navigation}) => {
   const {user, contact} = route.params;
   const [firstName, setFirstName] = useState(contact.givenName);
   const [lastName, setLastName] = useState(contact.familyName);
   const updateContact = useContactStore(state => state.updateContact);
   const styles = editStyles();
-  const {colors} = useScheme()
+  const {colors} = useScheme();
   useEffect(() => {
     requestWriteContactsPermission();
   }, []);
@@ -70,7 +64,9 @@ const EditContact = ({route, navigation}) => {
           style={styles.contactPhoto}
         />
         <View style={{marginLeft: 12}}>
-          <Text style={styles.contactName}>{contact.displayName}</Text>
+          <Text style={styles.contactName} numberOfLines={1}>
+            {contact.displayName}
+          </Text>
           <Text style={styles.contactPhone}>
             {contact.phoneNumbers[0].number}
           </Text>
@@ -87,6 +83,8 @@ const EditContact = ({route, navigation}) => {
           textColor={colors.text}
           underlineColor={colors.accent}
           activeUnderlineColor={colors.placeHolder}
+          maxLength={30}
+          numberOfLines={1}
         />
         <TextInput
           label="Фамилия"
@@ -98,6 +96,8 @@ const EditContact = ({route, navigation}) => {
           textColor={colors.text}
           underlineColor={colors.accent}
           activeUnderlineColor={colors.placeHolder}
+          maxLength={30}
+          numberOfLines={1}
         />
       </View>
     </View>

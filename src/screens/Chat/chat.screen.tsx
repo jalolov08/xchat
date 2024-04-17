@@ -29,6 +29,7 @@ import MessageImage from '../../components/MessageImage/messageImage.component';
 import MessageModal from '../../components/MessageModal/messageModal.component';
 import MessageDocument from '../../components/MessageDocument/messageDocument.component';
 import useListenMessageViewed from '../../hooks/useListenMessageViewed';
+import useContactStore, {Contact} from '../../zustand/useContacts';
 type PickedDocument = {
   uri: string;
   type: string;
@@ -56,9 +57,20 @@ export default function Chat({route}) {
     PickedDocument | undefined
   >();
   const [visible, setVisible] = React.useState(false);
-
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
+  const {contactList} = useContactStore();
+  function isPhoneNumberInContacts() {
+    return contactList.some(contact => {
+      if (contact.phoneNumbers) {
+        return contact.phoneNumbers.some(
+          phone => phone.number === otherParticipant.phone,
+        );
+      }
+      return false;
+    });
+  }
+
   const pickDocument = async () => {
     try {
       const res = await DocumentPicker.pick({
@@ -184,6 +196,8 @@ export default function Chat({route}) {
         <ChatHeader
           fullName={otherParticipant.fullName}
           photo={otherParticipant.photo}
+          isContact={isPhoneNumberInContacts()}
+          phone={otherParticipant.phone}
         />
       )}
       <View style={styles.container}>
@@ -202,7 +216,10 @@ export default function Chat({route}) {
               style={{alignSelf: 'center', marginTop: 100}}
             />
           ) : messages.length === 0 ? (
-            <Text style={{alignSelf:'center' , fontSize:16 , color:colors.text}}>У вас пока нет сообщений.</Text>
+            <Text
+              style={{alignSelf: 'center', fontSize: 16, color: colors.text}}>
+              У вас пока нет сообщений.
+            </Text>
           ) : (
             messages.map((messageItem, index) => {
               if (messageItem.messageType === 'image') {
