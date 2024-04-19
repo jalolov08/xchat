@@ -6,7 +6,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {styles as aboutStyles} from './aboutContact.style';
 import HeaderBack from '../../ui/HeaderBack/headerBack.ui';
 import {API, API_BASE} from '../../../config';
@@ -15,10 +15,11 @@ import {useScheme} from '../../contexts/ThemeContext/theme.context';
 import axios from 'axios';
 import useBlockedUsers from '../../zustand/useBlockedUsers';
 import {useBlockUser} from '../../hooks/useBlockUser';
+import LinearGradient from 'react-native-linear-gradient';
 export default function AboutContact({route, navigation}) {
   const {user, contact} = route.params;
   const styles = aboutStyles();
-  const {colors} = useScheme();
+  const {colors, dark} = useScheme();
   const {isUserBlocked} = useBlockedUsers();
   const {blockUser, isLoading} = useBlockUser();
   const modifiedUser = {
@@ -26,7 +27,7 @@ export default function AboutContact({route, navigation}) {
     fullName: `${user.name} ${user.surname}`,
     photo: user.photoUri,
     user: user._id,
-    phone:user.phone
+    phone: user.phone,
   };
   const handleChatDelete = async () => {
     try {
@@ -40,8 +41,13 @@ export default function AboutContact({route, navigation}) {
       Alert.alert(error.response.data.message);
     }
   };
+  const gradientColors = useMemo(() => {
+    return dark === true
+      ? ['#0C1D1E', '#0A1213']
+      : [colors.background, colors.background];
+  }, [dark, colors]);
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={gradientColors} style={styles.container}>
       <HeaderBack
         title="О контакте"
         backIcon={true}
@@ -100,6 +106,6 @@ export default function AboutContact({route, navigation}) {
           />
         )}
       </TouchableOpacity>
-    </View>
+    </LinearGradient>
   );
 }

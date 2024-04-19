@@ -1,8 +1,9 @@
 import {View, Text, StyleSheet, Pressable} from 'react-native';
-import React from 'react';
+import React, { useMemo } from 'react';
 import Icon, {Icons} from '../Icon/icon.ui';
 import {useNavigation} from '@react-navigation/native';
 import { useScheme } from '../../contexts/ThemeContext/theme.context';
+import LinearGradient from 'react-native-linear-gradient';
 type THeader = {
   backIcon?: boolean;
   title?: string;
@@ -16,7 +17,7 @@ export default function HeaderBack({
   onRightIconClick,
 }: THeader) {
   const navigation = useNavigation();
-  const {colors} = useScheme()
+  const {colors , dark} = useScheme()
   const styles = StyleSheet.create({
     container: {
       height: 60,
@@ -35,8 +36,13 @@ export default function HeaderBack({
       fontWeight:'600'
     },
   });
+  const gradientColors = useMemo(() => {
+    return dark === true
+      ? ['#0C1D1E', '#0A1213']
+      : [colors.background, colors.background];
+  }, [dark, colors]);
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={gradientColors} style={styles.container}>
       {backIcon && (
         <Pressable onPress={() => navigation.goBack()}>
           <Icon
@@ -58,7 +64,7 @@ export default function HeaderBack({
           />
         </Pressable>
       )}
-    </View>
+    </LinearGradient>
   );
 }
 

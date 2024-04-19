@@ -1,5 +1,5 @@
 import {View, Text, TouchableOpacity, Alert} from 'react-native';
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {styles as verifyStyles} from './verify.style';
 import {CodeField, Cursor} from 'react-native-confirmation-code-field';
 import LinearGradient from 'react-native-linear-gradient';
@@ -13,7 +13,7 @@ export default function Verify({navigation}) {
   const [code, setCode] = useState('');
   const {onVerify, authState} = useAuth();
   const styles = verifyStyles();
-  const {colors} = useScheme();
+  const {colors, dark} = useScheme();
   const {uploadToken} = useFcmTokenUpload();
   const handleVerify = async () => {
     const result = await onVerify(code);
@@ -21,17 +21,23 @@ export default function Verify({navigation}) {
       await uploadToken();
 
       navigation.navigate('ChangeProfile', {
-        name: null,
-        surname: null,
-        photoUri: null,
+        name: authState?.name,
+        surname: authState?.surname,
+        photoUri: authState?.photoUri,
+        back: false,
       });
     } else {
       Alert.alert(result.data.error);
       setCode('');
     }
   };
+  const gradientColors = useMemo(() => {
+    return dark === true
+      ? ['#0C1D1E', '#0A1213']
+      : [colors.background, colors.background];
+  }, [dark, colors]);
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={gradientColors} style={styles.container}>
       <View style={styles.textCont}>
         <Text style={styles.title}>Подтвердите номер</Text>
         <Text style={styles.subTitle}>
@@ -79,6 +85,6 @@ export default function Verify({navigation}) {
         disabled={code.length !== CELL_COUNT}>
         <Text style={styles.btnText}>Потвердить</Text>
       </TouchableOpacity>
-    </View>
+    </LinearGradient>
   );
 }

@@ -34,6 +34,7 @@ export const styles = () => {
       height: 60,
       borderRadius: 60,
       marginRight: 10,
+      backgroundColor:'gray'
     },
     name: {
       color: colors.text,

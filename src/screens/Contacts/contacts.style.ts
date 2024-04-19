@@ -28,6 +28,7 @@ export const styles = () => {
       height: 40,
       borderRadius: 20,
       marginRight: 10,
+      backgroundColor:'gray',
     },
     fullName: {
       fontSize: 17,

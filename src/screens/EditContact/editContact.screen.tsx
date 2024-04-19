@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {Image, PermissionsAndroid, Platform, Text, View} from 'react-native';
 import HeaderBack from '../../ui/HeaderBack/headerBack.ui';
 import {API} from '../../../config';
@@ -7,13 +7,14 @@ import Contacts from 'react-native-contacts';
 import useContactStore from '../../zustand/useContacts';
 import {styles as editStyles} from './editContact.style';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
+import LinearGradient from 'react-native-linear-gradient';
 const EditContact = ({route, navigation}) => {
   const {user, contact} = route.params;
   const [firstName, setFirstName] = useState(contact.givenName);
   const [lastName, setLastName] = useState(contact.familyName);
   const updateContact = useContactStore(state => state.updateContact);
   const styles = editStyles();
-  const {colors} = useScheme();
+  const {colors , dark} = useScheme();
   useEffect(() => {
     requestWriteContactsPermission();
   }, []);
@@ -49,9 +50,13 @@ const EditContact = ({route, navigation}) => {
       console.error('Ошибка при запросе разрешения WRITE_CONTACTS:', error);
     }
   };
-
+  const gradientColors = useMemo(() => {
+    return dark === true
+      ? ['#0C1D1E', '#0A1213']
+      : [colors.background, colors.background];
+  }, [dark, colors]);
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={gradientColors} style={styles.container}>
       <HeaderBack
         backIcon={true}
         title="Изменить контакт"
@@ -100,7 +105,7 @@ const EditContact = ({route, navigation}) => {
           numberOfLines={1}
         />
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 export default EditContact;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import { API } from '../../../config';
 import Contacts from 'react-native-contacts';
 import useContactStore from '../../zustand/useContacts';
 import { getContacts } from '../../utils/getContacts';
+import LinearGradient from 'react-native-linear-gradient';
 
 export default function ChatHeader({
   fullName,
@@ -27,7 +28,7 @@ export default function ChatHeader({
   isContact: boolean;
   phone: string;
 }) {
-  const { colors } = useScheme();
+  const { colors , dark } = useScheme();
   const navigation = useNavigation();
   const [contactAdded, setContactAdded] = useState(false);
   const { setContactList } = useContactStore();
@@ -77,9 +78,13 @@ export default function ChatHeader({
       marginLeft: 20,
     },
   });
-
+  const gradientColors = useMemo(() => {
+    return dark === true
+      ? ['#0C1D1E', '#0A1213']
+      : [colors.background, colors.background];
+  }, [dark, colors]);
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={gradientColors} style={styles.container}>
       <Pressable onPress={() => navigation.goBack()}>
         <Icon
           type={Icons.Ionicons}
@@ -108,6 +113,6 @@ export default function ChatHeader({
           />
         </TouchableOpacity>
       )}
-    </View>
+    </LinearGradient>
   );
 }

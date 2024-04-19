@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -17,12 +17,14 @@ import axios from 'axios';
 import {API, API_BASE} from '../../../config';
 import {useAuth} from '../../contexts/AuthContext/auth.context';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
+import {BackHandler} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 export default function ChangeProfile({navigation, route}) {
   const [photoUri, setPhotoUri] = useState(
     route?.params.photoUri ? API.concat(route.params.photoUri) : '',
   );
-
+  const back = route?.params.back;
   const [name, setName] = useState(route.params.name);
   const [surname, setSurname] = useState(route.params.surname);
   const styles = changeStyles();
@@ -34,7 +36,16 @@ export default function ChangeProfile({navigation, route}) {
   });
   const {authState, setAuthState} = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const {colors} = useScheme();
+  const {colors , dark} = useScheme();
+  useEffect(() => {
+    if (!back) {
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        () => true,
+      );
+      return () => backHandler.remove(); 
+    }
+  }, [back]);
 
   const ImagePicker = async () => {
     let options = {
@@ -117,16 +128,20 @@ export default function ChangeProfile({navigation, route}) {
       setIsLoading(false);
     }
   };
-
+  const gradientColors = useMemo(() => {
+    return dark === true
+      ? ['#0C1D1E', '#0A1213']
+      : [colors.background, colors.background];
+  }, [dark, colors]);
   return (
     <View style={{flex: 1}}>
       <HeaderBack
-        backIcon={true}
+        backIcon={back}
         title="Редактировать профиль"
         onRightIconClick={handleSaveChanges}
         rightIconName="checkmark-outline"
       />
-      <ScrollView style={styles.container}>
+      <LinearGradient colors={gradientColors} style={styles.container}>
         <View>
           <TouchableOpacity
             onPress={ImagePicker}
@@ -154,7 +169,7 @@ export default function ChangeProfile({navigation, route}) {
             />
           </View>
         </View>
-      </ScrollView>
+      </LinearGradient>
       {isLoading && (
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="large" color={colors.primary} />

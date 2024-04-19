@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {View, Text, Image, Switch, Pressable} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {styles as settingsStyle} from './settings.style';
@@ -6,6 +6,8 @@ import Icon, {Icons} from '../../ui/Icon/icon.ui';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
 import {useAuth} from '../../contexts/AuthContext/auth.context';
 import {API} from '../../../config';
+import FastImage from 'react-native-fast-image';
+import LinearGradient from 'react-native-linear-gradient';
 
 export default function Settings({navigation}) {
   const styles = settingsStyle();
@@ -47,9 +49,13 @@ export default function Settings({navigation}) {
     await onLogout();
     navigation.navigate('Login');
   };
-
+  const gradientColors = useMemo(() => {
+    return dark === true
+      ? ['#0C1D1E', '#0A1213']
+      : [colors.background, colors.background];
+  }, [dark, colors]);
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={gradientColors} style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Настройки</Text>
         <Pressable
@@ -58,6 +64,7 @@ export default function Settings({navigation}) {
               name: authState?.name,
               surname: authState?.surname,
               photoUri: authState?.photoUri,
+              back: true,
             })
           }>
           <Icon
@@ -69,7 +76,7 @@ export default function Settings({navigation}) {
         </Pressable>
       </View>
       <View style={styles.userCont}>
-        <Image
+        <FastImage
           source={{uri: `${API}${authState?.photoUri}`}}
           style={styles.photo}
         />
@@ -116,6 +123,6 @@ export default function Settings({navigation}) {
           color="#CF2A2A"
         />
       </Pressable>
-    </View>
+    </LinearGradient>
   );
 }

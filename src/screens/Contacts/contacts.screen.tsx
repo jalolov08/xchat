@@ -15,6 +15,8 @@ import {useScheme} from '../../contexts/ThemeContext/theme.context';
 import {useGetBlockedUsers} from '../../hooks/useGetBlockedUsers';
 import {useUploadContacts} from '../../hooks/useUploadContacts';
 import {Contact} from '../../types/contact.type';
+import FastImage from 'react-native-fast-image';
+import LinearGradient from 'react-native-linear-gradient';
 
 export default function ContactsScreen({navigation}) {
   useGetBlockedUsers();
@@ -26,7 +28,7 @@ export default function ContactsScreen({navigation}) {
   const styles = contactsStyles();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const {uploadContacts} = useUploadContacts();
-  const {colors} = useScheme();
+  const {colors, dark} = useScheme();
   useEffect(() => {
     const fetchContacts = async () => {
       try {
@@ -52,7 +54,6 @@ export default function ContactsScreen({navigation}) {
   useEffect(() => {
     const handleUploadContacts = async () => {
       try {
-
         const response = await uploadContacts(contacts);
         console.log(response);
       } catch (error) {
@@ -93,9 +94,14 @@ export default function ContactsScreen({navigation}) {
         return 0;
       });
   }, [users, searchQuery]);
+  const gradientColors = useMemo(() => {
+    return dark === true
+      ? ['#0C1D1E', '#0A1213']
+      : [colors.background, colors.background];
+  }, [dark, colors]);
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={gradientColors} style={styles.container}>
       <Text style={styles.title}>Контакты</Text>
       <Search
         containerStyle={{marginTop: 20}}
@@ -152,12 +158,15 @@ export default function ContactsScreen({navigation}) {
               onPress={() =>
                 navigation.navigate('AboutContact', {user, contact})
               }>
-              <Image source={{uri: `${API}${photoUri}`}} style={styles.image} />
+              <FastImage
+                source={{uri: `${API}${photoUri}`}}
+                style={styles.image}
+              />
               <Text style={styles.fullName}>{contactName}</Text>
             </TouchableOpacity>
           );
         })}
       </ScrollView>
-    </View>
+    </LinearGradient>
   );
 }

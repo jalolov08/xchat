@@ -10,6 +10,8 @@ import errorLoad from '../../assets/animations/error.json';
 import empty from '../../assets/animations/empty.json';
 import Lottie from '../../ui/Lottie/lottie.ui';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
+import FastImage from 'react-native-fast-image';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface OtherParticipant {
   user: string;
@@ -22,7 +24,7 @@ export default function Chats() {
   const {chats} = useChats();
   const {authState} = useAuth();
   const [searchQuery, setSearchQuery] = useState<string>('');
-
+  const {colors, dark} = useScheme();
   const styles = chatStyles();
 
   const filteredChats = useMemo(() => {
@@ -51,7 +53,7 @@ export default function Chats() {
       <TouchableOpacity
         style={styles.chatCont}
         onPress={() => navigation.navigate('Chat', {otherParticipant})}>
-        <Image
+        <FastImage
           source={{uri: `${API}${otherParticipant.photo}`}}
           style={styles.chatPhoto}
         />
@@ -64,9 +66,13 @@ export default function Chats() {
       </TouchableOpacity>
     );
   };
-
+  const gradientColors = useMemo(() => {
+    return dark === true
+      ? ['#0C1D1E', '#0A1213']
+      : [colors.background, colors.background];
+  }, [dark, colors]);
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={gradientColors} style={styles.container}>
       <Text style={styles.title}>Чаты</Text>
       <Search
         containerStyle={{marginTop: 20}}
@@ -87,6 +93,6 @@ export default function Chats() {
           keyExtractor={item => item._id}
         />
       )}
-    </View>
+    </LinearGradient>
   );
 }

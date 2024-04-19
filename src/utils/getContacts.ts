@@ -6,20 +6,15 @@ export async function getContacts() {
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
       {
-        title: 'Contacts',
-        message: 'This app would like to view your contacts.',
-        buttonPositive: 'Please accept bare mortal',
+        title: 'Контакты',
+        message: 'Это приложение хочет просмотреть ваши контакты.',
+        buttonPositive: 'Пожалуйста, примите разрешение.',
       },
     );
 
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
       const contacts = await Contacts.getAll();
-      // const allNumbers = contacts.reduce((numbers, contact) => {
-      //   const contactNumbers = contact.phoneNumbers.map(
-      //     phoneNumber => phoneNumber.number,
-      //   );
-      //   return [...numbers, ...contactNumbers];
-      // }, []);
+    
 
       return contacts;
     } else {

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   BackHandler,
   Pressable,
@@ -30,6 +30,7 @@ import MessageModal from '../../components/MessageModal/messageModal.component';
 import MessageDocument from '../../components/MessageDocument/messageDocument.component';
 import useListenMessageViewed from '../../hooks/useListenMessageViewed';
 import useContactStore, {Contact} from '../../zustand/useContacts';
+import LinearGradient from 'react-native-linear-gradient';
 type PickedDocument = {
   uri: string;
   type: string;
@@ -43,7 +44,7 @@ export default function Chat({route}) {
   const {otherParticipant} = route.params;
   const {loading} = useGetMessages(otherParticipant.user);
   const styles = chatStyles();
-  const {colors} = useScheme();
+  const {colors , dark} = useScheme();
   const [inputHeight, setInputHeight] = useState(60);
   const scrollViewRef = useRef<ScrollView>(null);
   const {messages, getMessageById} = useMessages();
@@ -180,9 +181,13 @@ export default function Chat({route}) {
       hideModal();
     }
   };
-
+  const gradientColors = useMemo(() => {
+    return dark === true
+      ? ['#0C1D1E', '#0A1213']
+      : [colors.background, colors.background];
+  }, [dark, colors]);
   return (
-    <View style={{flex: 1}}>
+    <LinearGradient colors={gradientColors} style={{flex: 1}}>
       <MessageModal
         visible={visible}
         hideModal={hideModal}
@@ -328,6 +333,6 @@ export default function Chat({route}) {
           </View>
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
