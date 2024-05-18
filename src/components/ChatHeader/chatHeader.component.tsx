@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -8,31 +8,28 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import Icon, { Icons } from '../../ui/Icon/icon.ui';
-import { useScheme } from '../../contexts/ThemeContext/theme.context';
-import { useNavigation } from '@react-navigation/native';
-import { API } from '../../../config';
+import Icon, {Icons} from '../../ui/Icon/icon.ui';
+import {useScheme} from '../../contexts/ThemeContext/theme.context';
+import {useNavigation} from '@react-navigation/native';
+import {API} from '../../../config';
 import Contacts from 'react-native-contacts';
 import useContactStore from '../../zustand/useContacts';
-import { getContacts } from '../../utils/getContacts';
+import {getContacts} from '../../utils/getContacts';
 import LinearGradient from 'react-native-linear-gradient';
+import {Contact} from '../../types/contact.type';
+import {TUser} from '../../types/user.type';
 
 export default function ChatHeader({
-  fullName,
-  photo,
-  isContact,
-  phone,
+  otherParticipant,
 }: {
-  fullName: string;
-  photo: string;
-  isContact: boolean;
-  phone: string;
+  otherParticipant: TUser;
 }) {
-  const { colors , dark } = useScheme();
+  const {colors, dark} = useScheme();
   const navigation = useNavigation();
   const [contactAdded, setContactAdded] = useState(false);
-  const { setContactList } = useContactStore();
-
+  const {setContactList, findContactByPhoneNumber} = useContactStore();
+  const {phone, fullName, photo} = otherParticipant;
+  console.log('🚀 ~ otherParticipant:', otherParticipant);
   const handleSaveNewContacts = async () => {
     const newPerson = {
       phoneNumbers: [
@@ -45,7 +42,7 @@ export default function ChatHeader({
 
     try {
       await Contacts.openContactForm(newPerson);
-      const contacts = await getContacts(); 
+      const contacts = await getContacts();
       setContactList(contacts);
       Alert.alert('Контакт успешно добавлен.');
       setContactAdded(true);
@@ -54,7 +51,19 @@ export default function ChatHeader({
       console.error('Error adding contact: ', error);
     }
   };
-
+  const isPhoneNumberInContacts = () => {
+    return Boolean(findContactByPhoneNumber(otherParticipant.phone));
+  };
+  const handlePress = () => {
+    if (isPhoneNumberInContacts()) {
+      navigation.navigate('AboutContact', {
+        contact: findContactByPhoneNumber(otherParticipant.phone),
+        user: otherParticipant,
+      });
+    } else {
+      console.log('Contact not found');
+    }
+  };
   const styles = StyleSheet.create({
     container: {
       height: 60,
@@ -93,18 +102,25 @@ export default function ChatHeader({
           size={24}
         />
       </Pressable>
-      <Image
-        style={styles.image}
-        source={{
-          uri: `${API}${photo}`,
+      <Pressable
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
-      />
-      <Text style={styles.name}>{fullName}</Text>
-      {!isContact && !contactAdded && (
+        onPress={handlePress}>
+        <Image
+          style={styles.image}
+          source={{
+            uri: `${API}${photo}`,
+          }}
+        />
+        <Text style={styles.name}>{fullName}</Text>
+      </Pressable>
+      {!isPhoneNumberInContacts() && !contactAdded && (
         <TouchableOpacity
           onPress={handleSaveNewContacts}
-          style={{ marginLeft: 'auto' }}
-        >
+          style={{marginLeft: 'auto'}}>
           <Icon
             type={Icons.Ionicons}
             name="person-add"

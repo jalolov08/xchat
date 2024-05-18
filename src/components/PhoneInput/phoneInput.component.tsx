@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {TextInputMask} from 'react-native-masked-text';
-import { useScheme } from '../../contexts/ThemeContext/theme.context';
+import {useScheme} from '../../contexts/ThemeContext/theme.context';
 
 type TPhoneInput = {
   value: string;
@@ -9,18 +9,18 @@ type TPhoneInput = {
 };
 
 export default function PhoneInput({value, onChange}: TPhoneInput) {
-    const {colors} = useScheme()
-const styles = StyleSheet.create({
-  input: {
-    marginTop: 70,
-    width: '100%',
-    fontSize: 19,
-    color: colors.text,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-});
+  const {colors} = useScheme();
+  const styles = StyleSheet.create({
+    input: {
+      marginTop: 70,
+      width: '100%',
+      fontSize: 19,
+      color: colors.text,
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+  });
   return (
     <TextInputMask
       style={styles.input}
@@ -37,4 +37,3 @@ const styles = StyleSheet.create({
     />
   );
 }
-

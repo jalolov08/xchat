@@ -36,14 +36,14 @@ export default function ChangeProfile({navigation, route}) {
   });
   const {authState, setAuthState} = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const {colors , dark} = useScheme();
+  const {colors, dark} = useScheme();
   useEffect(() => {
     if (!back) {
       const backHandler = BackHandler.addEventListener(
         'hardwareBackPress',
         () => true,
       );
-      return () => backHandler.remove(); 
+      return () => backHandler.remove();
     }
   }, [back]);
 
@@ -142,7 +142,7 @@ export default function ChangeProfile({navigation, route}) {
         rightIconName="checkmark-outline"
       />
       <LinearGradient colors={gradientColors} style={styles.container}>
-        <View>
+        <ScrollView>
           <TouchableOpacity
             onPress={ImagePicker}
             style={{alignSelf: 'center', marginTop: 20}}>
@@ -168,7 +168,7 @@ export default function ChangeProfile({navigation, route}) {
               onChangeText={text => setSurname(text)}
             />
           </View>
-        </View>
+        </ScrollView>
       </LinearGradient>
       {isLoading && (
         <View style={styles.loaderContainer}>

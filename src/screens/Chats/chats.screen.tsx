@@ -6,7 +6,6 @@ import useChats, {Chat} from '../../zustand/useChats';
 import Search from '../../ui/Search/search.ui';
 import {styles as chatStyles} from './chats.style';
 import {API} from '../../../config';
-import errorLoad from '../../assets/animations/error.json';
 import empty from '../../assets/animations/empty.json';
 import Lottie from '../../ui/Lottie/lottie.ui';
 import {useScheme} from '../../contexts/ThemeContext/theme.context';
@@ -48,6 +47,7 @@ export default function Chats() {
     const otherParticipant = item.participantDetails.find(
       (participant: OtherParticipant) => participant.user !== authState?._id,
     );
+    console.log("🚀 ~ renderItem ~ otherParticipant:", otherParticipant)
 
     return (
       <TouchableOpacity

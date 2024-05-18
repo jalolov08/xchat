@@ -29,7 +29,6 @@ import MessageImage from '../../components/MessageImage/messageImage.component';
 import MessageModal from '../../components/MessageModal/messageModal.component';
 import MessageDocument from '../../components/MessageDocument/messageDocument.component';
 import useListenMessageViewed from '../../hooks/useListenMessageViewed';
-import useContactStore, {Contact} from '../../zustand/useContacts';
 import LinearGradient from 'react-native-linear-gradient';
 type PickedDocument = {
   uri: string;
@@ -44,7 +43,7 @@ export default function Chat({route}) {
   const {otherParticipant} = route.params;
   const {loading} = useGetMessages(otherParticipant.user);
   const styles = chatStyles();
-  const {colors , dark} = useScheme();
+  const {colors, dark} = useScheme();
   const [inputHeight, setInputHeight] = useState(60);
   const scrollViewRef = useRef<ScrollView>(null);
   const {messages, getMessageById} = useMessages();
@@ -60,17 +59,7 @@ export default function Chat({route}) {
   const [visible, setVisible] = React.useState(false);
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
-  const {contactList} = useContactStore();
-  function isPhoneNumberInContacts() {
-    return contactList.some(contact => {
-      if (contact.phoneNumbers) {
-        return contact.phoneNumbers.some(
-          phone => phone.number === otherParticipant.phone,
-        );
-      }
-      return false;
-    });
-  }
+
 
   const pickDocument = async () => {
     try {
@@ -199,10 +188,8 @@ export default function Chat({route}) {
         <ChatHeaderSelected />
       ) : (
         <ChatHeader
-          fullName={otherParticipant.fullName}
-          photo={otherParticipant.photo}
-          isContact={isPhoneNumberInContacts()}
-          phone={otherParticipant.phone}
+          otherParticipant={otherParticipant}
+          
         />
       )}
       <View style={styles.container}>

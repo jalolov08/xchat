@@ -125,17 +125,14 @@ export default function ContactsScreen({navigation}) {
           style={{alignSelf: 'center', marginTop: 100}}
         />
       )}
-      {sortedFilteredUsers.length === 0 &&
-        !loading &&
-        !error &&
-        searchQuery.length > 0 && (
-          <Lottie
-            source={empty}
-            width={200}
-            height={200}
-            style={{alignSelf: 'center', marginTop: 100}}
-          />
-        )}
+      {sortedFilteredUsers.length === 0 && !loading && !error && (
+        <Lottie
+          source={empty}
+          width={200}
+          height={200}
+          style={{alignSelf: 'center', marginTop: 100}}
+        />
+      )}
       <ScrollView showsVerticalScrollIndicator={false}>
         {sortedFilteredUsers.map(user => {
           const {name, surname, photoUri, phone, _id} = user;

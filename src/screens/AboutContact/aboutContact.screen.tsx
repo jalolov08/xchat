@@ -18,16 +18,17 @@ import {useBlockUser} from '../../hooks/useBlockUser';
 import LinearGradient from 'react-native-linear-gradient';
 export default function AboutContact({route, navigation}) {
   const {user, contact} = route.params;
+  console.log("🚀 ~ AboutContact ~ user:", user)
   const styles = aboutStyles();
   const {colors, dark} = useScheme();
   const {isUserBlocked} = useBlockedUsers();
   const {blockUser, isLoading} = useBlockUser();
   const modifiedUser = {
-    _id: user._id,
-    fullName: `${user.name} ${user.surname}`,
-    photo: user.photoUri,
-    user: user._id,
+    user:user.user ? user.user : user._id,
+    fullName: user.fullName ? user.fullName : `${user.name} ${user.surname}`,
+    photo: user.photoUri ? user.photoUri : user.photo,
     phone: user.phone,
+
   };
   const handleChatDelete = async () => {
     try {
@@ -58,7 +59,7 @@ export default function AboutContact({route, navigation}) {
       />
       <View style={styles.contactCont}>
         <Image
-          source={{uri: `${API}${user.photoUri}`}}
+          source={{uri: `${API}${user.photoUri ? user.photoUri : user.photo}`}}
           style={styles.contactPhoto}
         />
         <View style={{marginLeft: 12}}>

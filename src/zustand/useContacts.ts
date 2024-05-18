@@ -32,9 +32,10 @@ type ContactStore = {
   contactList: Contact[];
   setContactList: (contacts: Contact[]) => void;
   updateContact: (updatedContact: Contact) => void;
+  findContactByPhoneNumber: (phoneNumber: string) => Contact | undefined;
 };
 
-const useContactStore = create<ContactStore>(set => ({
+const useContactStore = create<ContactStore>((set, get) => ({
   contactList: [],
   setContactList: contacts => set({contactList: contacts}),
   updateContact: updatedContact =>
@@ -43,6 +44,10 @@ const useContactStore = create<ContactStore>(set => ({
         contact.recordID === updatedContact.recordID ? updatedContact : contact,
       ),
     })),
+  findContactByPhoneNumber: phoneNumber =>
+    get().contactList.find(contact =>
+      contact.phoneNumbers.some(phone => phone.number === phoneNumber),
+    ),
 }));
 
 export default useContactStore;
